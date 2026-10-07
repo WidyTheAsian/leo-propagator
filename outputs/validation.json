@@ -1,0 +1,78 @@
+{
+  "versions": {
+    "python": "3.9.13",
+    "numpy": "2.0.2",
+    "scipy": "1.13.1",
+    "matplotlib": "3.9.4"
+  },
+  "model": {
+    "mu_m3_s2": 398600441800000.0,
+    "earth_radius_m": 6371000.0,
+    "initial_altitude_m": 400000.0,
+    "orbit_radius_m": 6771000.0,
+    "initial_speed_m_s": 7672.598648385013,
+    "period_s": 5544.855095980793,
+    "duration_s": 86400.0,
+    "exact_specific_energy_m2_s2": -29434385.009599764,
+    "exact_specific_angular_momentum_m2_s": 51951165448.21492
+  },
+  "solver": {
+    "method": "DOP853",
+    "rtol": 1e-10,
+    "atol": [
+      0.0001,
+      0.0001,
+      0.0001,
+      1e-07,
+      1e-07,
+      1e-07
+    ],
+    "output_interval_s": 10.0,
+    "output_samples": 8641,
+    "rhs_evaluations": 6191,
+    "message": "The solver successfully reached the end of the integration interval."
+  },
+  "nominal": {
+    "max_abs_altitude_error_m": 0.0014207623898983002,
+    "final_altitude_error_m": -0.00022682640701532364,
+    "max_abs_position_error_m": 0.007625973445076056,
+    "final_position_error_m": 0.0068483963496856985,
+    "max_abs_velocity_error_m_s": 8.388147824839331e-06,
+    "final_velocity_error_m_s": 7.838255355603897e-06,
+    "max_abs_specific_energy_error_m2_s2": 0.008693080395460129,
+    "final_specific_energy_error_m2_s2": -0.002459142357110977,
+    "max_abs_relative_energy_error": 2.9533759216049386e-10,
+    "final_relative_energy_error": -8.354658527123803e-11,
+    "max_abs_angular_momentum_error_m2_s": 7.67156982421875,
+    "final_angular_momentum_error_m2_s": 2.1701736450195312,
+    "max_abs_relative_angular_momentum_error": 1.4766886860056671e-10,
+    "final_relative_angular_momentum_error": 4.177333898664443e-11
+  },
+  "tighter": {
+    "rtol": 1e-12,
+    "atol": [
+      1e-06,
+      1e-06,
+      1e-06,
+      9.999999999999999e-10,
+      9.999999999999999e-10,
+      9.999999999999999e-10
+    ],
+    "rhs_evaluations": 10991,
+    "max_abs_altitude_error_m": 1.3640150427818298e-05,
+    "final_altitude_error_m": -1.7695128917694092e-08,
+    "max_abs_position_error_m": 0.0001199672504522619,
+    "final_position_error_m": 9.563970685034968e-05,
+    "max_abs_velocity_error_m_s": 1.3357732476257785e-07,
+    "final_velocity_error_m_s": 1.0745414972343324e-07,
+    "max_abs_specific_energy_error_m2_s2": 9.158998727798462e-05,
+    "final_specific_energy_error_m2_s2": -1.4141201972961426e-05,
+    "max_abs_relative_energy_error": 3.111666414912809e-12,
+    "final_relative_energy_error": -4.804313719600188e-13,
+    "max_abs_angular_momentum_error_m2_s": 0.08083343505859375,
+    "final_angular_momentum_error_m2_s": 0.01247406005859375,
+    "max_abs_relative_angular_momentum_error": 1.5559503691821652e-12,
+    "final_relative_angular_momentum_error": 2.4011126508851723e-13
+  },
+  "max_position_error_improvement_factor": 63.567126997802035
+}

@@ -1,0 +1,18 @@
+# Local Python environments and Conda installation/package cache
+.conda/
+.venv/
+conda/
+
+# Python bytecode and caches (includes *.pyc)
+__pycache__/
+*.py[cod]
+
+# Local Matplotlib cache
+.mplconfig/
+
+# Machine-specific editor settings
+.vscode/
+.idea/
+*.code-workspace
+
+# Keep environment.yml, requirements.txt and the small example outputs tracked.
