@@ -1,4 +1,4 @@
-"""Milestone 1: a circular orbit under Earth's central gravity, in SI units."""
+"""Cartesian propagation with optional J2; the CLI runs milestone 1 in SI units."""
 
 import argparse
 import json
@@ -14,6 +14,9 @@ from scipy.integrate import solve_ivp
 # Adopted model constants, rather than an Earth shape or gravity field model.
 MU = 3.986004418e14  # Earth's gravitational parameter [m^3 / s^2]
 EARTH_RADIUS = 6_371_000.0  # spherical mean radius [m]
+# NASA Earth fact sheet: https://nssdc.gsfc.nasa.gov/planetary/factsheet/earthfact.html
+EQUATORIAL_RADIUS = 6_378_137.0  # J2 gravity reference radius [m], not altitude radius
+J2 = 1.08263e-3  # positive, dimensionless; symmetry axis is inertial +z
 INITIAL_ALTITUDE = 400_000.0  # [m]
 ORBIT_RADIUS = EARTH_RADIUS + INITIAL_ALTITUDE
 CIRCULAR_SPEED = np.sqrt(MU / ORBIT_RADIUS)  # [m / s]
@@ -25,46 +28,95 @@ RTOL = 1e-10  # dimensionless
 ATOL = np.array([1e-4] * 3 + [1e-7] * 3)  # [m, m, m, m/s, m/s, m/s]
 
 
-def initial_state():
-    """[x, y, z, vx, vy, vz]: start on +x, moving along +y."""
-    return np.array([ORBIT_RADIUS, 0.0, 0.0, 0.0, CIRCULAR_SPEED, 0.0])
+def initial_state(inclination=0.0):
+    """Circular Keplerian state on +x; velocity tilted about x by inclination [rad]."""
+    return np.array([ORBIT_RADIUS, 0.0, 0.0, 0.0,
+                     CIRCULAR_SPEED * np.cos(inclination),
+                     CIRCULAR_SPEED * np.sin(inclination)])
 
 
-def two_body_rhs(t, state):
-    """Return [velocity, acceleration]; gravity is independent of time t."""
+def j2_acceleration(position, j2=J2):
+    """J2 contribution [m/s^2] for positions [m] of shape (3,) or (3, N).
+
+    Derived as -grad(Phi_J2) from the potential in specific_potential.
+    J2 is positive for Earth's oblateness; it equals -C20 when unnormalized.
+    """
+    position = np.asarray(position)
+    radius = np.linalg.norm(position, axis=0)
+    z_ratio_squared = (position[2] / radius)**2
+    factor = 1.5 * j2 * MU * EQUATORIAL_RADIUS**2 / radius**5
+    return factor * position * np.array([
+        5.0 * z_ratio_squared - 1.0,
+        5.0 * z_ratio_squared - 1.0,
+        5.0 * z_ratio_squared - 3.0,
+    ])
+
+
+def specific_potential(position, j2=0.0):
+    """Central + J2 gravitational potential [m^2/s^2], zero at infinity.
+
+    Phi = -mu/r * [1 - J2*(R_eq/r)^2*P2(z/r)]. The Hamiltonian/potential
+    convention is given in Arnas (2022), Eq. (1): https://arxiv.org/abs/2212.08746
+    Shape (3,) gives a scalar; shape (3, N) gives N potential values.
+    """
+    position = np.asarray(position)
+    radius = np.linalg.norm(position, axis=0)
+    potential = -MU / radius
+    if j2 != 0.0:
+        p2 = 0.5 * (3.0 * (position[2] / radius)**2 - 1.0)
+        potential += MU / radius * j2 * (EQUATORIAL_RADIUS / radius)**2 * p2
+    return potential
+
+
+def two_body_rhs(t, state, j2=0.0):
+    """Return [velocity, central + optional J2 acceleration], independent of t."""
     position = state[:3]
     velocity = state[3:]
     acceleration = -MU * position / np.linalg.norm(position)**3
+    if j2 != 0.0:
+        acceleration += j2_acceleration(position, j2)
     return np.concatenate((velocity, acceleration))
 
 
-def analytical_state(times):
-    """Exact circular states, shape (6, N), at elapsed times in seconds."""
+def analytical_state(times, inclination=0.0):
+    """Exact two-body circular states (6, N); elapsed seconds, inclination radians."""
     phase = MEAN_MOTION * np.atleast_1d(times)
     cosine, sine = np.cos(phase), np.sin(phase)
-    zeros = np.zeros_like(phase)
+    cos_i, sin_i = np.cos(inclination), np.sin(inclination)
     return np.vstack((
-        ORBIT_RADIUS * cosine, ORBIT_RADIUS * sine, zeros,
-        -CIRCULAR_SPEED * sine, CIRCULAR_SPEED * cosine, zeros,
+        ORBIT_RADIUS * cosine, ORBIT_RADIUS * sine * cos_i, ORBIT_RADIUS * sine * sin_i,
+        -CIRCULAR_SPEED * sine, CIRCULAR_SPEED * cosine * cos_i,
+        CIRCULAR_SPEED * cosine * sin_i,
     ))
 
 
-def propagate(rtol=RTOL, atol=ATOL):
-    """Integrate all six components for 24 hours, saving every 10 seconds."""
-    times = np.linspace(0.0, DURATION, int(DURATION / SAMPLE_INTERVAL) + 1)
+def propagate(rtol=RTOL, atol=ATOL, *, state0=None, duration=DURATION,
+              sample_interval=SAMPLE_INTERVAL, j2=0.0):
+    """Integrate Cartesian states in SI; defaults preserve milestone 1.
+
+    J2 = 0 disables the perturbation. Always include the final time, even when
+    the duration is not an integer multiple of the output sample interval.
+    """
+    if not np.isfinite(duration) or duration <= 0.0:
+        raise ValueError("Duration must be finite and positive.")
+    if not np.isfinite(sample_interval) or sample_interval <= 0.0:
+        raise ValueError("Sample interval must be finite and positive.")
+    if state0 is None:
+        state0 = initial_state()
+    times = np.append(np.arange(0.0, duration, sample_interval), duration)
     solution = solve_ivp(
-        two_body_rhs, (0.0, DURATION), initial_state(),
+        two_body_rhs, (0.0, duration), state0, args=(j2,),
         method="DOP853", t_eval=times, rtol=rtol, atol=atol,
     )
     if not solution.success:
         raise RuntimeError(f"Orbit integration failed: {solution.message}")
-    if solution.t[-1] != DURATION or not np.all(np.isfinite(solution.y)):
-        raise RuntimeError("Integration did not return a finite full-day trajectory.")
+    if solution.t[-1] != duration or not np.all(np.isfinite(solution.y)):
+        raise RuntimeError("Integration did not return a finite full-duration trajectory.")
     return solution
 
 
 def diagnostics(times, states):
-    """Errors against the exact circular trajectory and its conserved values."""
+    """Milestone 1 equatorial two-body errors; not the invariants for J2 motion."""
     position, velocity = states[:3], states[3:]
     radius = np.linalg.norm(position, axis=0)
     energy = 0.5 * np.sum(velocity**2, axis=0) - MU / radius

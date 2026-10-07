@@ -1,0 +1,175 @@
+{
+  "versions": {
+    "python": "3.9.13",
+    "numpy": "2.0.2",
+    "scipy": "1.13.1",
+    "matplotlib": "3.9.4"
+  },
+  "model": {
+    "mu_m3_s2": 398600441800000.0,
+    "j2": 0.00108263,
+    "j2_reference_radius_m": 6378137.0,
+    "altitude_reference_radius_m": 6371000.0,
+    "symmetry_axis": "Fixed inertial z-axis",
+    "duration_s": 604800.0,
+    "inclination_rad": 0.9005898940290741,
+    "initial_state_si": [
+      6771000.0,
+      0.0,
+      0.0,
+      0.0,
+      4765.8176194107145,
+      6012.965361426416
+    ]
+  },
+  "initial_osculating_elements": {
+    "semimajor_axis_m": 6770999.999999999,
+    "eccentricity": 1.1102230246251565e-16,
+    "inclination_rad": 0.9005898940290741,
+    "raan_rad": 0.0,
+    "argument_of_periapsis_rad": null,
+    "true_anomaly_rad": null,
+    "argument_of_latitude_rad": 0.0,
+    "true_longitude_rad": null
+  },
+  "solver": {
+    "method": "DOP853",
+    "output_interval_s": 60.0,
+    "output_samples": 10081,
+    "tolerance_levels": {
+      "two_body": {
+        "rtol": 1e-10,
+        "atol": [
+          0.0001,
+          0.0001,
+          0.0001,
+          1e-07,
+          1e-07,
+          1e-07
+        ],
+        "rhs_evaluations": 43751
+      },
+      "nominal": {
+        "rtol": 1e-10,
+        "atol": [
+          0.0001,
+          0.0001,
+          0.0001,
+          1e-07,
+          1e-07,
+          1e-07
+        ],
+        "rhs_evaluations": 43871
+      },
+      "tighter": {
+        "rtol": 1e-12,
+        "atol": [
+          1e-06,
+          1e-06,
+          1e-06,
+          9.999999999999999e-10,
+          9.999999999999999e-10,
+          9.999999999999999e-10
+        ],
+        "rhs_evaluations": 78248
+      },
+      "reference": {
+        "rtol": 1e-13,
+        "atol": [
+          1.0000000000000001e-07,
+          1.0000000000000001e-07,
+          1.0000000000000001e-07,
+          9.999999999999999e-11,
+          9.999999999999999e-11,
+          9.999999999999999e-11
+        ],
+        "rhs_evaluations": 104453
+      }
+    }
+  },
+  "two_body": {
+    "max_position_error_vs_circular_m": 1.5446168384788435,
+    "max_velocity_error_vs_circular_m_s": 0.0017502344589072976,
+    "fitted_raan_rate_rad_s": 5.631485185000762e-21
+  },
+  "invariants": {
+    "hz_relative_error_normalization": "Initial angular momentum magnitude |h(0)|",
+    "two_body": {
+      "max_abs_specific_energy_error_m2_s2": 0.019256379455327988,
+      "final_specific_energy_error_m2_s2": -0.014849834144115448,
+      "max_abs_relative_energy_error": 6.542137520130856e-10,
+      "final_relative_energy_error": -5.045063499465779e-10,
+      "max_abs_hz_error_m2_s": 10.555614471435547,
+      "final_hz_error_m2_s": -8.140117645263672,
+      "max_abs_relative_hz_error": 2.0318340080276766e-10,
+      "final_relative_hz_error": -1.5668787360271573e-10
+    },
+    "nominal": {
+      "max_abs_specific_energy_error_m2_s2": 0.01719590276479721,
+      "final_specific_energy_error_m2_s2": -0.013686217367649078,
+      "max_abs_relative_energy_error": 5.836507025965503e-10,
+      "final_relative_energy_error": -4.645275384360837e-10,
+      "max_abs_hz_error_m2_s": 9.391925811767578,
+      "final_hz_error_m2_s": -7.470611572265625,
+      "max_abs_relative_hz_error": 1.8078373662530205e-10,
+      "final_relative_hz_error": -1.4380065409143426e-10
+    },
+    "tighter": {
+      "max_abs_specific_energy_error_m2_s2": 0.0001114383339881897,
+      "final_specific_energy_error_m2_s2": -7.619708776473999e-05,
+      "max_abs_relative_energy_error": 3.7823580894831245e-12,
+      "final_relative_energy_error": -2.5862255921069673e-12,
+      "max_abs_hz_error_m2_s": 0.0612335205078125,
+      "final_hz_error_m2_s": -0.041965484619140625,
+      "max_abs_relative_hz_error": 1.1786746260553146e-12,
+      "final_relative_hz_error": -8.077871642932043e-13
+    },
+    "reference": {
+      "max_abs_specific_energy_error_m2_s2": 1.1712312698364258e-05,
+      "final_specific_energy_error_m2_s2": -8.229166269302368e-06,
+      "max_abs_relative_energy_error": 3.975307158298771e-13,
+      "final_relative_energy_error": -2.793083178333964e-13,
+      "max_abs_hz_error_m2_s": 0.00653076171875,
+      "final_hz_error_m2_s": -0.004634857177734375,
+      "max_abs_relative_hz_error": 1.25709628694661e-13,
+      "final_relative_hz_error": -8.921565354206374e-14
+    }
+  },
+  "altitude_bounds_m": {
+    "two_body": {
+      "min": 399999.9960481934,
+      "max": 400000.0014591869
+    },
+    "nominal": {
+      "min": 387786.7128254622,
+      "max": 400000.0
+    }
+  },
+  "raan": {
+    "measured_rad_s": -1.0186458943360117e-06,
+    "predicted_from_initial_elements_rad_s": -1.0142335686503578e-06,
+    "relative_discrepancy_initial_elements": 0.004350403912902854,
+    "mean_proxy_elements": {
+      "semimajor_axis_m": 6765019.335199407,
+      "eccentricity": 0.0009455999829110342,
+      "inclination_rad": 0.9002390160343464
+    },
+    "mean_proxy_note": "Arithmetic sample averages over the run; not a formal osculating-to-mean conversion.",
+    "predicted_from_mean_proxy_rad_s": -1.0178274276847256e-06,
+    "relative_discrepancy_mean_proxy": 0.0008041310629129698,
+    "max_abs_fit_residual_rad": 0.00045121722593122193,
+    "final_unwrapped_rad": -0.616358532503658,
+    "nominal_tighter_rate_difference_rad_s": 7.31155451938123e-16
+  },
+  "convergence": {
+    "max_nominal_position_difference_m": 1.4204982076380581,
+    "max_nominal_velocity_difference_m_s": 0.0016103052220273581,
+    "max_tighter_position_difference_m": 0.00637542536787662,
+    "max_tighter_velocity_difference_m_s": 7.225751317845054e-06,
+    "position_improvement_factor": 222.80838150743892
+  },
+  "physical_variations_not_conservation_errors": {
+    "max_two_body_specific_energy_change_m2_s2": 52148.04946264997,
+    "max_full_h_vector_change_relative": 0.47512351281351967
+  }
+}

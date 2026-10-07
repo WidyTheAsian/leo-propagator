@@ -5,9 +5,14 @@ in Python, with an eventual comparison against Orekit. The implementation is
 kept small so that the physical model, numerical integration and verification
 can be read and explained directly.
 
-**Milestone 1 is implemented:** a satellite initially in a circular orbit
+**Milestone 1 remains the default:** a satellite initially in a circular orbit
 400,000 m above a spherical Earth, subject only to Earth's central gravity.
-All calculations, saved values and plot axes use metres and seconds.
+All calculations, saved values and plot axes use SI units; angles use radians.
+
+**Milestone 2 adds optional J2 gravity:** a seven-day comparison of two-body
+and J2 motion from the same 400,000 m, 51.6-degree initial Cartesian state.
+The original tests and example outputs are preserved. J2 results are saved
+separately under `outputs/j2/`.
 
 ## Implemented capabilities
 
@@ -18,7 +23,11 @@ All calculations, saved values and plot axes use metres and seconds.
   matching times, and quantify altitude, specific energy and angular momentum errors.
 - Check convergence by repeating the propagation with tighter tolerances.
 - Save orbit, altitude and validation figures, plus a JSON report, and run four
-  automated physics and numerical verification tests.
+  original milestone 1 physics and numerical verification tests.
+- Enable an axisymmetric J2 acceleration and verify the matching total energy
+  and axial angular momentum; compare secular nodal regression with theory.
+- Extract osculating elements with explicit undefined-angle handling, and run
+  13 additional tests for J2, orbital geometry and seven-day convergence.
 
 ## Setup and run
 
@@ -33,6 +42,7 @@ Python version family):
 conda env create --prefix ./.conda --file environment.yml
 conda activate ./.conda
 python orbit.py
+python j2.py --days 7
 python -m unittest -v
 python -m pip check
 ```
@@ -43,6 +53,7 @@ Alternatively, on Windows with Python 3.12 installed:
 py -3.12 -m venv .venv
 .\.venv\Scripts\python.exe -m pip install -r requirements.txt
 .\.venv\Scripts\python.exe orbit.py
+.\.venv\Scripts\python.exe j2.py --days 7
 .\.venv\Scripts\python.exe -m unittest -v
 .\.venv\Scripts\python.exe -m pip check
 ```
@@ -53,6 +64,7 @@ On Linux/macOS with Python 3.12 installed:
 python3.12 -m venv .venv
 .venv/bin/python -m pip install -r requirements.txt
 .venv/bin/python orbit.py
+.venv/bin/python j2.py --days 7
 .venv/bin/python -m unittest -v
 .venv/bin/python -m pip check
 ```
@@ -65,24 +77,34 @@ creating it again. For a direct invocation in PowerShell without Conda activatio
 $env:PATH = "$PWD\.conda;$PWD\.conda\Library\bin;$PWD\.conda\Scripts;$env:PATH"
 .\.conda\python.exe -m pip install -r requirements.txt
 .\.conda\python.exe orbit.py
+.\.conda\python.exe j2.py --days 7
 .\.conda\python.exe -m unittest -v
 ```
 
-The script saves figures without opening windows. Add `--show` for plot windows
-or `--output-dir path` to select the output directory. Every normal run also
-performs the tighter-tolerance comparison.
+Both scripts save figures without opening windows. Add `--show` for plot
+windows or `--output-dir path` to select the output directory. `orbit.py`
+runs the original 24-hour equatorial two-body example. `j2.py` defaults to
+seven days; `--days` selects another positive duration. Each example performs
+its own tolerance comparison. Use `python -m unittest -v test` to run only
+the four original tests, or `python -m unittest -v` to run all 17.
 
 ## Files and outputs
 
-- `orbit.py`: constants, initial state, equations, solver, analytical reference,
-  diagnostics and plotting. No additional dynamics or propagation frameworks.
-- `test.py`: four physics and full-day validation checks, using `unittest`.
+- `orbit.py`: shared constants, central/J2 gravity, initial state and solver,
+  plus the original milestone 1 reference, diagnostics and plotting.
+- `j2.py`: inclined comparison, correct J2 invariants, secular RAAN analysis
+  and plots, including three integration tolerance levels.
+- `elements.py`: instantaneous Keplerian elements and undefined-angle masks.
+- `test.py`: four original physics and full-day checks, unchanged.
+- `test_j2.py`: 13 J2, element geometry and seven-day verification checks.
 - `requirements.txt`: NumPy, SciPy and Matplotlib versions used for this milestone.
 - `outputs/orbit_and_altitude.png`: the numerical orbit overlaid on the exact
   circle, and altitude versus elapsed time.
 - `outputs/validation.png`: position, velocity, energy and angular momentum errors.
 - `outputs/validation.json`: model constants, solver settings, package versions,
   maximum and final errors, and the tighter-tolerance comparison.
+- `outputs/j2/comparison.png`, `outputs/j2/validation.png` and
+  `outputs/j2/validation.json`: separate milestone 2 figures and numerical report.
 
 ![Orbit and altitude](outputs/orbit_and_altitude.png)
 
@@ -117,8 +139,11 @@ The radius is the volumetric mean radius listed in
 `mu` is an adopted model parameter, used identically in the force law and reference
 solution. Altitude means `norm(position) - R_E`; it is not ellipsoidal/geodetic
 altitude. The satellite is a test particle: its mass cancels from the equations.
-The only acceleration is Earth's central gravity. Earth oblateness, atmosphere
-and drag, other bodies, radiation pressure, relativity and manoeuvres are omitted.
+Milestone 1 uses only Earth's central gravity. Milestone 2 adds the J2 gravity
+term, with the symmetry axis fixed along inertial `z`, while keeping spherical
+altitude as the reporting convention. Both modes omit atmosphere and drag,
+other bodies, radiation pressure, relativity and manoeuvres. Higher gravity
+harmonics, time-varying coefficients and pole motion are not included.
 
 ## Equations and initial conditions
 
@@ -278,8 +303,9 @@ The validation figure makes the trajectory and conservation errors visible.
 Errors can oscillate because both integration and output interpolation
 contribute; they need not grow monotonically with time.
 
-All **4 tests pass**. The trajectory checks require maximum position error
-below 0.1 m, velocity error below 1e-4 m/s and altitude error below 0.01 m.
+All **4 original milestone 1 tests pass**. The trajectory checks require
+maximum position error below 0.1 m, velocity error below 1e-4 m/s and altitude
+error below 0.01 m.
 Both relative conservation errors must stay below 1e-8, and the tighter run
 must reduce both position and velocity errors by more than a factor of 10.
 The initial-state check verifies tangency, inward gravity and the centripetal
@@ -301,7 +327,8 @@ so these checks do not establish their suitability for a particular real satelli
 Real-world orbit-prediction accuracy also depends on the initial-state
 uncertainty, force models, atmospheric density and satellite properties, and
 the physical reference frame and epoch. Earth's oblateness and atmospheric
-drag are omitted here even though they matter for an actual low Earth orbit.
+drag matter for an actual low Earth orbit. Milestone 1 omits both; milestone 2
+includes J2 but still omits drag and higher gravity harmonics.
 This project has not been compared with tracking observations or Orekit yet;
 the small numerical errors are not a claim of millimetre accuracy for real
 satellite position predictions.
@@ -332,14 +359,235 @@ Cartesian state, elapsed times and force model. Match the spherical radius
 when comparing altitudes. Using a different Earth radius changes the initial
 orbital radius even if both cases are described as a 400,000 m orbit.
 
-## Planned milestones
+## Milestone 2: J2 gravitational perturbation
 
-These are future work; milestone 1 continues to use only central gravity.
+### Force model, potential and constants
 
-1. **J2:** add Earth's leading zonal gravity harmonic and verify the expected
-   nodal precession for an inclined orbit.
-2. **Atmospheric drag:** introduce an explicit density model and satellite
+J2 is the leading zonal term describing Earth's oblateness. The model is
+axisymmetric about the fixed inertial `z` axis. Rotation about that axis does
+not change this zonal potential, so no Earth-rotation transformation is needed
+for this idealised model.
+
+| Quantity | Value | Unit |
+| --- | ---: | --- |
+| `mu` (unchanged) | 3.986004418e14 | m³/s² |
+| Positive `J2` | 1.08263e-3 | dimensionless |
+| J2 reference equatorial radius `R_eq` | 6,378,137 | m |
+| Spherical altitude reference `R_E` | 6,371,000 | m |
+| Initial inclination | 0.9005898940290741 (51.6 degrees) | rad |
+| Comparison duration | 604,800 | s |
+
+`J2` and `R_eq` come from [NASA's Earth fact sheet](https://nssdc.gsfc.nasa.gov/planetary/factsheet/earthfact.html).
+The two radii have different roles: `R_eq` sets the gravity harmonic's scale;
+`R_E` defines the existing spherical altitude. The satellite still starts at
+radius 6,771,000 m. A positive J2 corresponds to negative **unnormalized** C20.
+
+Using `r = norm(position)` and `s = z/r`, the specific potential, zero at infinity, is
+
+$$
+\Phi(\mathbf r)=-\frac{\mu}{r}
+\left[1-J_2\left(\frac{R_{\rm eq}}r\right)^2P_2(s)\right],
+\qquad P_2(s)=\tfrac12(3s^2-1).
+$$
+
+This sign convention agrees with the Hamiltonian in
+[Arnas (2022), equation (1)](https://arxiv.org/pdf/2212.08746#page=3).
+Differentiating the potential gives `a = -grad(Phi)`: central gravity plus
+
+$$
+\mathbf a_{J2}=\frac{3J_2\mu R_{\rm eq}^2}{2r^5}
+\begin{bmatrix}
+x(5s^2-1)\\
+y(5s^2-1)\\
+z(5s^2-3)
+\end{bmatrix}.
+$$
+
+Acceleration has units m/s² and potential has units m²/s². For positive J2,
+the additional acceleration is inward on the equator and outward on the pole.
+`two_body_rhs(t, state, j2=0.0)` and `propagate(..., j2=0.0)` retain pure
+central gravity. Passing `j2=orbit.J2` adds the perturbation; zero skips it
+exactly. `specific_potential` uses the same coefficient and reference radius.
+
+### Shared initial conditions
+
+At the ascending node, set initial RAAN to zero and rotate the original
+circular velocity about `x` by the inclination:
+
+$$
+\mathbf r_0=(6771000,0,0)\ \mathrm m,
+\qquad
+\mathbf v_0=(0,4765.817619411,6012.965361426)\ \mathrm{m/s}.
+$$
+
+The speed is still `sqrt(mu/r_0)`, and velocity remains perpendicular to
+position. Both simulations use **this identical Cartesian state**. It is
+circular in the two-body model, and initially has zero osculating Keplerian
+eccentricity in the J2 case. It is not an exact circular solution of the J2
+field: periodic radius and element changes are physical responses to the
+additional force. The velocity is not retuned for J2.
+
+```python
+import numpy as np
+import orbit
+
+state0 = orbit.initial_state(np.deg2rad(51.6))
+central = orbit.propagate(state0=state0, duration=604800.0, j2=0.0)
+perturbed = orbit.propagate(state0=state0, duration=604800.0, j2=orbit.J2)
+```
+
+### Osculating elements, RAAN and undefined angles
+
+`elements.osculating_elements` treats each Cartesian state as an instantaneous
+Keplerian orbit. It computes `h = r cross v`, node vector `N = z_hat cross h`,
+eccentricity vector `e = (v cross h)/mu - r/r`, and `a` from the instantaneous
+two-body energy. That energy is used to define an **osculating element**, not
+as the conserved J2 energy.
+
+RAAN is `atan2(N_y, N_x)`, measured from `+x` toward `+y` in the equatorial
+plane. Returned angles are radians in `[0, 2*pi)`. The comparison applies
+`np.unwrap` before fitting RAAN as `intercept + rate*time`. The free intercept
+and the fit over all 10,081 output states reduce the influence of periodic
+oscillations compared with a difference of two endpoints. Saving every 60 s
+is sufficiently fine to avoid ambiguous RAAN jumps in this example.
+
+| Case | Undefined angles returned as `NaN` | Useful defined angle |
+| --- | --- | --- |
+| Circular, inclined | Argument of periapsis, true anomaly | RAAN and argument of latitude |
+| Eccentric, equatorial | RAAN, argument of periapsis, argument of latitude | True anomaly |
+| Circular, equatorial | RAAN, argument of periapsis, true anomaly, argument of latitude | Geometric true longitude `atan2(y, x)` |
+
+Circular means `e <= 1e-8`; equatorial means `sin(i) <= 1e-10`, including
+the retrograde `i = pi` limit. Longitude is measured geometrically from `+x`
+toward `+y`. Radial states with zero angular momentum have no orbital plane
+and raise `ValueError`. RAAN fitting and the secular node prediction reject
+undefined equatorial nodes explicitly. The JSON report represents undefined
+initial angles as `null` rather than nonstandard JSON NaNs.
+
+### First-order secular node prediction
+
+For mean elements `a`, `e`, `i`, the standard first-order J2 prediction is
+
+$$
+\dot\Omega=-\frac32J_2 n\left(\frac{R_{\rm eq}}p\right)^2\cos i,
+\qquad n=\sqrt{\frac{\mu}{a^3}},\quad p=a(1-e^2).
+$$
+
+See [Rickman, NASA (2014), slide 103](https://ntrs.nasa.gov/api/citations/20200007746/downloads/20200007746.pdf#page=103).
+The negative rate for this prograde orbit describes westward nodal regression.
+The main comparison first inserts the initial osculating values
+`a = 6,771,000 m`, `e = 0`, `i = 0.900589894 rad`. It also reports a second
+estimate using arithmetic averages of the sampled osculating `a`, `e`, `i`.
+These averages are a diagnostic **mean-element proxy**, not a formal
+osculating-to-mean transformation.
+
+### Actual seven-day results
+
+Run with Python 3.9.13, NumPy 2.0.2, SciPy 1.13.1 and Matplotlib 3.9.4.
+Both cases reach 604,800 s and share 10,081 output times, spaced by 60 s.
+All maxima below refer to those saved samples, including interpolated states.
+
+| RAAN quantity | Measured value |
+| --- | ---: |
+| Fitted two-body drift [rad/s] | 5.631485e-21 |
+| Fitted J2 secular drift [rad/s] | -1.018645894336e-6 |
+| First order, initial elements [rad/s] | -1.014233568650e-6 |
+| Relative discrepancy using initial elements | 0.435040% |
+| First order, sample mean proxy [rad/s] | -1.017827427685e-6 |
+| Relative discrepancy using mean proxy | 0.080413% |
+| Maximum absolute RAAN fit residual [rad] | 4.512172e-4 |
+| Final unwrapped J2 RAAN [rad] | -0.616358533 |
+
+The measured RAAN contains short-period oscillations as well as secular drift.
+The residual panel shows four oscillations in roughly two nominal orbital
+periods; a finite-duration line fit does not remove them perfectly. More
+fundamentally, first-order averaged theory expects mean elements, while the
+specified initial state supplies osculating elements. The sample means are
+`a = 6,765,019.335 m`, `e = 0.000945600`, and `i = 0.900239016 rad`; they differ
+from the initial values. Their use improves agreement, supporting the
+mean-versus-osculating explanation. The remaining discrepancy also includes
+averaging choices and higher-order effects omitted by first-order theory.
+This interpretation is consistent with the distinction and transformations
+discussed in [Arnas (2022)](https://arxiv.org/abs/2212.08746).
+
+Tightening tolerances changes the fitted rate by only **7.311555e-16 rad/s**,
+far below the 4.412326e-9 rad/s initial-element theory discrepancy. The latter
+is therefore not explained by the integration error at these settings.
+
+The J2 spherical altitude ranges from **387,786.713 m to 400,000.000 m**.
+The two-body altitude stays within 0.004 m of 400,000 m. The substantial J2
+radius variation follows from the shared Keplerian initial state; total
+energy conservation rules out interpreting it as dissipative orbital decay.
+
+![J2 trajectories, altitude and RAAN](outputs/j2/comparison.png)
+
+### J2 conservation and convergence
+
+The time-independent potential conserves
+
+$$
+E=\tfrac12\|\mathbf v\|^2+\Phi(\mathbf r),
+\qquad h_z=(\mathbf r\times\mathbf v)_z.
+$$
+
+Axial symmetry gives zero torque about `z`, preserving `h_z`. The full
+angular momentum vector rotates as the orbital plane precesses. The two-body
+energy `v²/2 - mu/r` exchanges with the J2 potential contribution and also
+varies physically. For this run, its maximum change is **52,148.049 m²/s²**,
+and the full angular momentum vector changes by **0.475124** of its initial
+magnitude. Neither is required to be constant in the J2 tests.
+
+Energy error is referenced to the initial **matching total energy** and
+normalized by its absolute value. Axial momentum error is `h_z(t)-h_z(0)`,
+normalized by initial `norm(h)` so that the scale remains defined for polar
+orbits with zero `h_z`. Absolute errors are also recorded in the JSON report.
+
+| Solver level | `rtol` | Position `atol` [m] | Velocity `atol` [m/s] |
+| --- | ---: | ---: | ---: |
+| Nominal | 1e-10 | 1e-4 | 1e-7 |
+| Tighter | 1e-12 | 1e-6 | 1e-9 |
+| Numerical reference | 1e-13 | 1e-7 | 1e-10 |
+
+| Seven-day J2 check | Nominal | Tighter |
+| --- | ---: | ---: |
+| Maximum absolute total specific energy error [m²/s²] | 1.719590e-2 | 1.114383e-4 |
+| Maximum relative total specific energy error | 5.836507e-10 | 3.782358e-12 |
+| Maximum absolute `h_z` error [m²/s] | 9.391926 | 0.061234 |
+| Maximum `abs(h_z error) / norm(h_0)` | 1.807837e-10 | 1.178675e-12 |
+| Maximum position difference from reference [m] | 1.420498 | 0.006375425 |
+| Maximum velocity difference from reference [m/s] | 0.001610305 | 7.225751e-6 |
+
+The tighter position difference is **222.81 times smaller**. The reference
+run's relative energy and axial momentum errors are 3.975307e-13 and
+1.257096e-13. J2 trajectory differences are measured against this finite-
+accuracy numerical reference, not an exact J2 trajectory or observations.
+The inclined two-body run independently matches the analytical circular
+trajectory within 1.544617 m in position over seven days.
+
+All **17 tests pass**, including all four unchanged milestone 1 tests.
+New checks cover zero-J2 equivalence, force versus finite-difference potential
+gradient, equatorial/polar force signs, known element orientations, circular
+and equatorial singularities, RAAN unwrapping, correct invariant conservation,
+first-order rate agreement within 1%, and tolerance convergence. The nominal
+and tighter J2 position and velocity differences must improve by more than
+10 times, and both correct relative invariant errors must remain below 1e-8.
+`orbit.py` also reproduces the committed milestone 1 plots and report unchanged.
+
+![J2 conservation and convergence](outputs/j2/validation.png)
+
+Read `orbit.j2_acceleration` and `orbit.specific_potential` together, then
+`elements.osculating_elements`, `j2.fit_raan_drift` and `j2.run_comparison`.
+The force integrates Cartesian states; orbital elements are extracted for
+analysis, not used as singular integration coordinates. Full-precision
+results, initial state, constants and all solver settings are in
+[`outputs/j2/validation.json`](outputs/j2/validation.json).
+
+## Remaining milestones
+
+J2 is implemented; the following remain future work.
+
+3. **Atmospheric drag:** introduce an explicit density model and satellite
    drag properties, then examine orbital decay and sensitivity to those inputs.
-3. **Orekit comparison:** match the initial Cartesian state, inertial frame,
+4. **Orekit comparison:** match the initial Cartesian state, inertial frame,
    epoch, Earth constants, force models and output times; compare trajectories
    while accounting for numerical tolerances and model differences.
