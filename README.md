@@ -14,6 +14,13 @@ and J2 motion from the same 400,000 m, 51.6-degree initial Cartesian state.
 The original tests and example outputs are preserved. J2 results are saved
 separately under `outputs/j2/`.
 
+**Milestone 3 adds optional atmospheric drag:** configurable mass, drag
+coefficient and constant effective area, an illustrative exponential density
+profile, a co-rotating atmosphere and a lower-altitude stopping event. A
+seven-day density-sensitivity study compares J2-only with density factors
+0.5, 1 and 2. Results are separate under `outputs/drag/`. This is a learning
+experiment, not a validated space-weather forecast.
+
 ## Implemented capabilities
 
 - Integrate all six Cartesian position and velocity components for 86,400 s
@@ -28,6 +35,9 @@ separately under `outputs/j2/`.
   and axial angular momentum; compare secular nodal regression with theory.
 - Extract osculating elements with explicit undefined-angle handling, and run
   13 additional tests for J2, orbital geometry and seven-day convergence.
+- Compare drag-induced decay, density and acceleration histories, and position
+  differences in the J2-only RTN frame; verify drag work against energy change
+  and convergence for every density case, with 17 additional tests.
 
 ## Setup and run
 
@@ -43,6 +53,7 @@ conda env create --prefix ./.conda --file environment.yml
 conda activate ./.conda
 python orbit.py
 python j2.py --days 7
+python drag.py --days 7
 python -m unittest -v
 python -m pip check
 ```
@@ -54,6 +65,7 @@ py -3.12 -m venv .venv
 .\.venv\Scripts\python.exe -m pip install -r requirements.txt
 .\.venv\Scripts\python.exe orbit.py
 .\.venv\Scripts\python.exe j2.py --days 7
+.\.venv\Scripts\python.exe drag.py --days 7
 .\.venv\Scripts\python.exe -m unittest -v
 .\.venv\Scripts\python.exe -m pip check
 ```
@@ -65,6 +77,7 @@ python3.12 -m venv .venv
 .venv/bin/python -m pip install -r requirements.txt
 .venv/bin/python orbit.py
 .venv/bin/python j2.py --days 7
+.venv/bin/python drag.py --days 7
 .venv/bin/python -m unittest -v
 .venv/bin/python -m pip check
 ```
@@ -78,25 +91,32 @@ $env:PATH = "$PWD\.conda;$PWD\.conda\Library\bin;$PWD\.conda\Scripts;$env:PATH"
 .\.conda\python.exe -m pip install -r requirements.txt
 .\.conda\python.exe orbit.py
 .\.conda\python.exe j2.py --days 7
+.\.conda\python.exe drag.py --days 7
 .\.conda\python.exe -m unittest -v
 ```
 
-Both scripts save figures without opening windows. Add `--show` for plot
+All three scripts save figures without opening windows. Add `--show` for plot
 windows or `--output-dir path` to select the output directory. `orbit.py`
-runs the original 24-hour equatorial two-body example. `j2.py` defaults to
-seven days; `--days` selects another positive duration. Each example performs
-its own tolerance comparison. Use `python -m unittest -v test` to run only
-the four original tests, or `python -m unittest -v` to run all 17.
+runs the original 24-hour equatorial two-body example. `j2.py` and `drag.py`
+default to seven days; `--days` selects another positive duration. Each example
+performs its own tolerance comparison. Use `python -m unittest -v test` to run only
+the four original tests, or `python -m unittest -v` to run all 34.
 
 ## Files and outputs
 
-- `orbit.py`: shared constants, central/J2 gravity, initial state and solver,
+- `orbit.py`: shared constants, central/J2 gravity, initial state and solver
+  with optional drag work and altitude termination,
   plus the original milestone 1 reference, diagnostics and plotting.
 - `j2.py`: inclined comparison, correct J2 invariants, secular RAAN analysis
   and plots, including three integration tolerance levels.
 - `elements.py`: instantaneous Keplerian elements and undefined-angle masks.
 - `test.py`: four original physics and full-day checks, unchanged.
 - `test_j2.py`: 13 J2, element geometry and seven-day verification checks.
+- `atmosphere.py`: configurable spacecraft properties, illustrative density
+  and co-rotating drag acceleration.
+- `drag.py`: density experiments, nodal-period averaging, RTN differences,
+  work-energy diagnostics, convergence and plots.
+- `test_drag.py`: 17 drag, guard, averaging, geometry and seven-day checks.
 - `requirements.txt`: NumPy, SciPy and Matplotlib versions used for this milestone.
 - `outputs/orbit_and_altitude.png`: the numerical orbit overlaid on the exact
   circle, and altitude versus elapsed time.
@@ -105,6 +125,8 @@ the four original tests, or `python -m unittest -v` to run all 17.
   maximum and final errors, and the tighter-tolerance comparison.
 - `outputs/j2/comparison.png`, `outputs/j2/validation.png` and
   `outputs/j2/validation.json`: separate milestone 2 figures and numerical report.
+- `outputs/drag/decay.png`, `atmosphere.png`, `rtn.png`, `validation.png` and
+  `validation.json`: separate milestone 3 figures and numerical report.
 
 ![Orbit and altitude](outputs/orbit_and_altitude.png)
 
@@ -329,6 +351,8 @@ uncertainty, force models, atmospheric density and satellite properties, and
 the physical reference frame and epoch. Earth's oblateness and atmospheric
 drag matter for an actual low Earth orbit. Milestone 1 omits both; milestone 2
 includes J2 but still omits drag and higher gravity harmonics.
+Milestone 3 includes drag with a deliberately simple illustrative atmosphere;
+it does not estimate the actual density or weather along a real orbit.
 This project has not been compared with tracking observations or Orekit yet;
 the small numerical errors are not a claim of millimetre accuracy for real
 satellite position predictions.
@@ -564,7 +588,8 @@ accuracy numerical reference, not an exact J2 trajectory or observations.
 The inclined two-body run independently matches the analytical circular
 trajectory within 1.544617 m in position over seven days.
 
-All **17 tests pass**, including all four unchanged milestone 1 tests.
+The **17 milestone 1 and 2 tests pass**, including all four unchanged
+milestone 1 tests.
 New checks cover zero-J2 equivalence, force versus finite-difference potential
 gradient, equatorial/polar force signs, known element orientations, circular
 and equatorial singularities, RAAN unwrapping, correct invariant conservation,
@@ -582,12 +607,310 @@ analysis, not used as singular integration coordinates. Full-precision
 results, initial state, constants and all solver settings are in
 [`outputs/j2/validation.json`](outputs/j2/validation.json).
 
-## Remaining milestones
+## Milestone 3: atmospheric drag and density sensitivity
 
-J2 is implemented; the following remain future work.
+### Equations, parameters and frame
 
-3. **Atmospheric drag:** introduce an explicit density model and satellite
-   drag properties, then examine orbital decay and sensitivity to those inputs.
-4. **Orekit comparison:** match the initial Cartesian state, inertial frame,
-   epoch, Earth constants, force models and output times; compare trajectories
-   while accounting for numerical tolerances and model differences.
+The state and initial conditions are exactly those of milestone 2: spherical
+altitude 400,000 m, inclination 0.900589894 rad (51.6 degrees), ascending node
+on `+x`, and speed `sqrt(mu/r_0)`. The initial velocity is retained because it
+defines the common comparison state; it is not an exact circular solution of
+J2 plus drag. All cases have identical mass, area, coefficient and initial
+Cartesian state. Only the density multiplier changes between drag cases.
+
+The spherical altitude and exponential density are
+
+$$
+h=\|\mathbf r\|-R_E,\qquad
+\rho(h)=f\rho_{\rm ref}\exp\left[-\frac{h-h_{\rm ref}}{H}\right].
+$$
+
+`f` is the dimensionless density multiplier. The following density parameters
+are **illustrative teaching choices**, not measurements or a fitted atmosphere.
+The spacecraft is also an example; its effective area remains constant even
+as the relative flow direction changes.
+
+| Parameter | Default | Unit / meaning |
+| --- | ---: | --- |
+| Mass `mass_kg` | 1,000 | kg |
+| Drag coefficient `cd` | 2.2 | dimensionless |
+| Effective cross-sectional area `area_m2` | 10 | m² |
+| Reference density `rho_ref_kg_m3` | 4e-12 | kg/m³, illustrative |
+| Reference altitude `h_ref_m` | 400,000 | m, spherical altitude |
+| Scale height `scale_height_m` | 60,000 | m, illustrative constant |
+| Density factors `f` | 0.5, 1, 2 | dimensionless |
+| Earth rotation rate `omega_rad_s` | 7.2921150e-5 | rad/s |
+| Lower stopping altitude `min_altitude_m` | 200,000 | m, configurable model guard |
+
+The rotation rate is the mean Earth angular velocity listed by the
+[IERS numerical standards](https://hpiers.obspm.fr/eop-pc/index.php?index=constants).
+The atmosphere rotates rigidly about the **fixed inertial +z axis**, aligned
+with the J2 symmetry axis. Without winds,
+
+$$
+\boldsymbol\omega_E=(0,0,\omega_E),\qquad
+\mathbf v_{\rm atm}=\boldsymbol\omega_E\times\mathbf r,
+\qquad \mathbf v_{\rm rel}=\mathbf v-\mathbf v_{\rm atm},
+$$
+
+$$
+\mathbf a_D=-\tfrac12\rho C_D\frac{A}{m}
+\|\mathbf v_{\rm rel}\|\mathbf v_{\rm rel},\qquad
+\dot{\mathbf r}=\mathbf v,\quad
+\dot{\mathbf v}=\mathbf a_{\rm central}+\mathbf a_{J2}+\mathbf a_D.
+$$
+
+See [NASA's atmospheric rotation and drag equations, slide 22](https://ntrs.nasa.gov/api/citations/20160012488/downloads/20160012488.pdf#page=22).
+Density times area/mass times speed squared has units m/s². The acceleration
+opposes **atmosphere-relative** velocity. At a fixed Cartesian state it scales
+linearly with density, coefficient and area, and inversely with mass. Those
+parameters are multiplicatively coupled; varying density alone does not
+identify which uncertain property would cause an observed trajectory change.
+
+### Running and configuring the experiment
+
+```powershell
+python drag.py --days 7
+python drag.py --days 7 --mass-kg 1000 --cd 2.2 --area-m2 10 --rho-ref-kg-m3 4e-12 --h-ref-m 400000 --scale-height-m 60000 --min-altitude-m 200000
+```
+
+The second command spells out the defaults. Use `--output-dir` for separate
+custom runs. Each command runs J2-only, a zero-density check, and all three
+density cases at three tolerance levels. Model properties are also accessible
+through the small immutable `DragModel`:
+
+```python
+import numpy as np
+import orbit
+from atmosphere import DragModel
+
+state0 = orbit.initial_state(np.deg2rad(51.6))
+j2_only = orbit.propagate(state0=state0, duration=604800.0, j2=orbit.J2)
+with_drag = orbit.propagate(state0=state0, duration=604800.0, j2=orbit.J2,
+                            drag=DragModel(density_multiplier=1.0))
+print(with_drag.terminated_early, with_drag.t[-1])
+print(with_drag.work_m2_s2[-1])
+```
+
+`drag=None` preserves the central/J2 modes. Zero reference density or zero
+multiplier skips the drag force and work state exactly. Zero area or coefficient
+also disables drag. Mass and scale height must be positive; density, area and
+coefficient cannot be negative, and all model parameters must be finite.
+
+The solver terminates on a **downward** crossing of the configured minimum
+altitude. It returns a successful stopped solution with the actual root time
+and six-component boundary state appended to the output, rather than treating
+termination as a failed integration or extending to seven days. Initial
+states on or below the limit raise `ValueError`. Event checks limit internal
+steps to `PERIOD/16 = 346.553443 s`; output remains at 60 s intervals plus the
+event. As in any adaptive event solver, trial stages can evaluate the force
+slightly past the boundary while locating the root. No reported trajectory
+continues below it. The limit is a guard for this toy profile, not a reentry
+prediction or evidence of atmospheric validity down to 200,000 m.
+
+Reports mark later checkpoints unavailable if a run stops early, and comparisons
+use only the common available interval. The example cases all complete seven
+days without reaching the guard. To see termination on the early J2 radius
+oscillation, run `python drag.py --min-altitude-m 395000 --output-dir outputs/drag-guard`.
+
+### Averaging and the reference RTN frame
+
+Instantaneous altitude still contains the roughly 12,000 m J2 oscillations.
+Osculating semimajor axis is computed from instantaneous **Keplerian** energy,
+`a = -mu / (2 * (v²/2 - mu/r))`; it also oscillates with J2. It is a useful
+decay indicator after averaging, but the central + J2 total energy is the one
+used for the work check.
+
+`nodal_windows` brackets successive ascending equatorial crossings of the
+J2-only orbit, then refines their times using the solver's dense output.
+`average_semimajor_axis` performs a time average over each complete window
+using 32-point Gauss-Legendre quadrature on dense Cartesian states. Every
+case uses the **same reference windows**, approximately 5,533 s long, so
+the averages compare matching time intervals. Plot points are placed at
+window midpoints; incomplete end orbits are omitted. The drag orbit's own
+period changes slightly; these are averages over reference orbital periods,
+not a formal osculating-to-mean conversion. The 32-versus-64-point quadrature
+test checks that integration of the reference averages is resolved within
+0.01 m. Equatorial nodes are undefined and nodal averaging raises `ValueError`.
+All existing circular/equatorial angle handling remains unchanged.
+
+For simultaneous Cartesian positions, define the reference frame using the
+J2-only state:
+
+$$
+\hat{\mathbf R}=\frac{\mathbf r_b}{\|\mathbf r_b\|},\qquad
+\hat{\mathbf N}=\frac{\mathbf r_b\times\mathbf v_b}
+{\|\mathbf r_b\times\mathbf v_b\|},\qquad
+\hat{\mathbf T}=\hat{\mathbf N}\times\hat{\mathbf R}.
+$$
+
+Project `r_drag - r_b` onto these orthonormal axes. Positive R points outward;
+positive T is transverse/along-track; positive N follows reference angular
+momentum. T is perpendicular to R and is not exactly the velocity direction
+on an eccentric orbit. RTN coordinates are **projections of a finite position
+difference**, not linearised orbital-element changes or distance travelled
+along the orbit. In particular, R difference is not altitude difference.
+
+### Actual seven-day density-sensitivity results
+
+Run with Python 3.9.13, NumPy 2.0.2, SciPy 1.13.1 and Matplotlib 3.9.4.
+Every nominal case reaches 604,800 s with 10,081 saved states. Instantaneous
+values below are evaluated at the exact checkpoint times using dense output.
+All differences are drag case minus J2-only. Mean-a differences use the last
+**complete reference orbit before** the checkpoint; their precise windows
+are 77,464.051–82,997.197 s, 248,991.594–254,524.740 s and
+597,579.844–603,112.991 s, respectively, rather than the checkpoint instant.
+
+| Checkpoint | Density factor | Altitude difference [m] | Orbit-averaged a difference [m] |
+| --- | ---: | ---: | ---: |
+| 24 hours (86,400 s) | 0.5 | -194.687 | -189.764 |
+| 24 hours | 1 | -390.060 | -380.129 |
+| 24 hours | 2 | -782.882 | -762.671 |
+| 72 hours (259,200 s) | 0.5 | -486.903 | -597.484 |
+| 72 hours | 1 | -980.683 | -1,200.956 |
+| 72 hours | 2 | -1,989.827 | -2,426.363 |
+| Seven days (604,800 s) | 0.5 | -1,920.655 | -1,434.719 |
+| Seven days | 1 | -3,839.229 | -2,904.704 |
+| Seven days | 2 | -7,678.746 | -5,958.719 |
+
+| Checkpoint | Density factor | R difference [m] | T difference [m] | N difference [m] |
+| --- | ---: | ---: | ---: | ---: |
+| 24 hours | 0.5 | -211.411 | 15,036.314 | -8.744 |
+| 24 hours | 1 | -457.107 | 30,106.406 | -17.424 |
+| 24 hours | 2 | -1,052.299 | 60,348.305 | -34.588 |
+| 72 hours | 0.5 | -1,845.773 | 135,592.658 | 82.795 |
+| 72 hours | 1 | -6,453.264 | 272,057.956 | 173.350 |
+| 72 hours | 2 | -24,178.580 | 547,432.753 | 377.764 |
+| Seven days | 0.5 | -42,609.111 | 740,698.106 | -377.670 |
+| Seven days | 1 | -168,788.146 | 1,484,251.617 | -1,002.299 |
+| Seven days | 2 | -681,443.770 | 2,941,186.940 | -2,938.872 |
+
+Higher density produces greater energy loss and semimajor-axis decay. The
+response is close to linear early on, but not exactly linear over seven days:
+decay changes the encountered density and velocity, feeding back into drag.
+Although drag opposes relative motion, a lower orbit has a higher mean motion;
+the accumulated orbital phase moves ahead of the J2-only reference. This
+explains the large positive T differences. At large phase separation, chord
+geometry also gives a substantial negative R projection, much larger than
+the actual change of orbital radius. N differences include the plane response
+to co-rotation and different J2 precession histories as the elements evolve.
+
+![Drag altitude and orbit-averaged semimajor axis](outputs/drag/decay.png)
+
+| Density factor | Density range [kg/m³] | Drag magnitude range [m/s²] | Minimum altitude [m] |
+| --- | --- | --- | ---: |
+| 0.5 | 2.000e-12 to 2.508e-12 | 1.197e-6 to 1.504e-6 | 386,412.422 |
+| 1 | 4.000e-12 to 5.136e-12 | 2.394e-6 to 3.080e-6 | 385,006.037 |
+| 2 | 8.000e-12 to 1.078e-11 | 4.788e-6 to 6.469e-6 | 382,083.388 |
+
+Density and acceleration oscillate with altitude and increase as the orbit
+decays. All cases start at a maximum spherical altitude of 400,000 m. Bounds
+are maxima/minima on the saved grid, not rigorous bounds between samples.
+
+![Density and drag acceleration](outputs/drag/atmosphere.png)
+![Position differences in the J2-only RTN frame](outputs/drag/rtn.png)
+
+### Work-energy verification and numerical convergence
+
+For the same time-independent central + J2 potential used in milestone 2,
+
+$$
+E=\tfrac12\|\mathbf v\|^2+\Phi(\mathbf r),\qquad
+\frac{dE}{dt}=\mathbf v\cdot\mathbf a_D,\qquad
+E(t)-E(0)=W(t)=\int_0^t\mathbf v\cdot\mathbf a_D\,dt.
+$$
+
+The gravitational terms cancel because `a_gravity = -grad(Phi)`. The velocity
+in this identity is **inertial** velocity, even though the drag force uses
+relative velocity. Using `v_rel dot a_drag` instead would describe a different
+work balance involving the atmosphere's rotational motion. Relative-frame
+drag power is always nonpositive; inertial-frame drag power is negative in
+this example, but need not be negative for every possible state in a rotating
+atmosphere. Neither E nor h_z is required to remain constant with drag.
+
+DOP853 advances position and velocity as before, evaluating gravity, density,
+relative velocity and drag at its trial stage states. With active drag it
+also advances a seventh scalar `W`, with `W(0)=0` and derivative
+`v dot a_drag`, at the same stages and interpolation order. W has no feedback
+into the physical derivatives. `propagate` returns six-component `y`/`sol`,
+plus `work_m2_s2` and, when dense output is requested, `work_sol`.
+This avoids approximating accumulated work with a coarse 60 s trapezoidal
+sum. A separate test integrates inertial drag power with adaptive `quad`
+over one period and agrees with W within 1e-6 m²/s²; replacing inertial
+velocity with relative velocity fails that check by more than 1%.
+
+The diagnostic residual is `E(t) - E(0) - W(t)`, with a relative scale of
+`abs(E(0))`, not energy change divided by itself. The three tolerance levels
+use the Cartesian tolerances in milestone 2 and work absolute tolerances
+1e-5, 1e-7 and 1e-8 m²/s². The reference remains a finite-accuracy numerical
+run. All levels use the same physics and initial state.
+
+| Density factor | Nominal max work residual [m²/s²] | Tighter max work residual [m²/s²] | Nominal max position difference from reference [m] | Tighter max position difference [m] |
+| --- | ---: | ---: | ---: | ---: |
+| 0.5 | 1.873038e-2 | 1.218830e-4 | 1.564719 | 0.007000831 |
+| 1 | 1.867585e-2 | 1.209863e-4 | 1.577089 | 0.006853069 |
+| 2 | 1.878921e-2 | 1.223812e-4 | 1.603643 | 0.007238184 |
+
+The nominal work residual is at most 6.3773e-10 of initial total energy;
+the tighter residual is at most 4.1538e-12. Reference residuals range from
+1.2418e-5 to 1.2908e-5 m²/s². Tighter maximum position differences improve
+by factors of 223.50, 230.13 and 221.55. Maximum velocity differences also
+fall from about 0.0018 m/s to approximately 8e-6 m/s. These errors are far
+smaller than the differences caused by the chosen density factors.
+
+For factor 1, final nominal energy change is -12,767.993312 m²/s² and
+integrated work is -12,767.978349 m²/s²; the roughly 0.015 m²/s² discrepancy
+is the numerical work-balance residual. Physical energy loss and numerical
+work-balance error have different
+meanings.
+
+![Drag work-energy balance and convergence](outputs/drag/validation.png)
+
+All **34 tests pass**: the unchanged 17 previous tests and 17 drag tests.
+They check exponential density, force scaling and direction, co-rotation,
+zero-density equivalence, RTN orientation and distance preservation, guarded
+termination with the actual boundary state, averaging, independent work
+quadrature, shared initial states, all checkpoint comparisons and tolerance
+convergence at every density factor. The seven-day zero-density maximum
+Cartesian state difference is **exactly zero**. Both original scripts reproduce
+their committed plots and JSON reports unchanged, and `pip check` reports no
+broken requirements.
+
+Full-precision checkpoint values, averaging intervals, solver settings, work
+residuals and convergence results are in
+[`outputs/drag/validation.json`](outputs/drag/validation.json). To explain the
+implementation, follow `DragModel.density` → `relative_velocity` →
+`acceleration`, then `orbit.propagate` and `drag.work_energy_diagnostics`.
+The initial state defines the common experiment, stage evaluations advance
+the orbit, and the force checks, work balance and convergence establish
+numerical consistency with the specified toy model.
+
+### Scope and limitations
+
+This is a **density-sensitivity study**, not a validated space-weather
+forecast or a calibrated orbit prediction. The exponential profile has one
+constant scale height and is spherical and static. It contains no solar or
+geomagnetic inputs, latitude/longitude variation, local solar time, composition
+or temperature evolution, winds or atmospheric super-rotation. Constant Cd,
+area and mass omit attitude changes, gas-surface interaction variability and
+spacecraft operations. The fixed rotation vector and generic ECI frame have
+no epoch or Earth-orientation corrections. Altitudes use the original mean
+spherical radius, not ellipsoidal or geodetic height. Higher gravity harmonics,
+third bodies, radiation pressure and manoeuvres remain absent.
+
+Real density and drag are influenced by space weather and uncertain spacecraft
+properties, as discussed in
+[NASA's collision-avoidance handbook, Appendix N](https://www.nasa.gov/wp-content/uploads/2024/04/ca-handbook-rev-1-appendix-n-update-march-2024.pdf).
+Factors 0.5 and 2 are prescribed experiments, not a confidence interval or
+forecast ensemble. Small solver errors verify these equations; they do not
+validate the density choices or establish real-world prediction accuracy.
+No tracking observations, operational atmosphere or Orekit comparison have
+been used yet.
+
+## Remaining milestone
+
+Milestones 1–3 are implemented. **Orekit comparison** remains future work:
+match the initial Cartesian state, inertial frame, epoch, Earth constants,
+force models (including density and relative atmospheric velocity) and output
+times; compare trajectories while accounting for numerical tolerances and
+model differences.

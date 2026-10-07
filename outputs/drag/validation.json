@@ -1,0 +1,470 @@
+{
+  "study": "Illustrative density sensitivity; not a validated space-weather forecast.",
+  "versions": {
+    "python": "3.9.13",
+    "numpy": "2.0.2",
+    "scipy": "1.13.1",
+    "matplotlib": "3.9.4"
+  },
+  "model": {
+    "mu_m3_s2": 398600441800000.0,
+    "j2": 0.00108263,
+    "j2_reference_radius_m": 6378137.0,
+    "spherical_radius_m": 6371000.0,
+    "initial_state_si": [
+      6771000.0,
+      0.0,
+      0.0,
+      0.0,
+      4765.8176194107145,
+      6012.965361426416
+    ],
+    "inclination_rad": 0.9005898940290741,
+    "requested_duration_s": 604800.0,
+    "spacecraft_and_atmosphere": {
+      "mass_kg": 1000.0,
+      "cd": 2.2,
+      "area_m2": 10.0,
+      "rho_ref_kg_m3": 4e-12,
+      "h_ref_m": 400000.0,
+      "scale_height_m": 60000.0,
+      "density_multiplier": 1.0,
+      "omega_rad_s": 7.292115e-05,
+      "min_altitude_m": 200000.0
+    }
+  },
+  "solver": {
+    "method": "DOP853",
+    "output_interval_s": 60.0,
+    "max_internal_step_s": 346.55344349879954,
+    "work_method": "Seventh ODE state, W'=inertial v dot a_drag; W(0)=0.",
+    "relative_work_residual_normalization": "Absolute initial total central + J2 specific energy."
+  },
+  "j2_only": {
+    "end_time_s": 604800.0,
+    "output_samples": 10081,
+    "stopped_at_altitude_limit": false,
+    "rtol": 1e-10,
+    "cartesian_atol_si": [
+      0.0001,
+      0.0001,
+      0.0001,
+      1e-07,
+      1e-07,
+      1e-07
+    ]
+  },
+  "zero_density_check": {
+    "same_output_times": true,
+    "max_abs_state_difference_si": 0.0
+  },
+  "averaging": {
+    "description": "Time averages over common complete J2-only ascending-node periods; partial orbits omitted.",
+    "quadrature": "32-point Gauss-Legendre on dense Cartesian output, per period.",
+    "checkpoint_note": "Mean-a differences use the last complete reference orbit before each checkpoint, not the instantaneous time."
+  },
+  "cases": {
+    "0.5": {
+      "density_multiplier": 0.5,
+      "solver_levels": {
+        "nominal": {
+          "rtol": 1e-10,
+          "cartesian_atol_si": [
+            0.0001,
+            0.0001,
+            0.0001,
+            1e-07,
+            1e-07,
+            1e-07
+          ],
+          "work_atol_m2_s2": 1e-05,
+          "rhs_evaluations": 43457,
+          "end_time_s": 604800.0,
+          "stopped_at_altitude_limit": false,
+          "output_samples": 10081,
+          "max_abs_work_energy_residual_m2_s2": 0.0187303807160788,
+          "max_abs_relative_work_energy_residual": 6.35732826264861e-10,
+          "final_specific_energy_change_m2_s2": -6305.105978652835,
+          "final_specific_work_m2_s2": -6305.091029445011
+        },
+        "tighter": {
+          "rtol": 1e-12,
+          "cartesian_atol_si": [
+            1e-06,
+            1e-06,
+            1e-06,
+            9.999999999999999e-10,
+            9.999999999999999e-10,
+            9.999999999999999e-10
+          ],
+          "work_atol_m2_s2": 1.0000000000000001e-07,
+          "rhs_evaluations": 77507,
+          "end_time_s": 604800.0,
+          "stopped_at_altitude_limit": false,
+          "output_samples": 10081,
+          "max_abs_work_energy_residual_m2_s2": 0.0001218829675053712,
+          "max_abs_relative_work_energy_residual": 4.136862169556547e-12,
+          "final_specific_energy_change_m2_s2": -6305.090955402702,
+          "final_specific_work_m2_s2": -6305.090871986918
+        },
+        "reference": {
+          "rtol": 1e-13,
+          "cartesian_atol_si": [
+            1.0000000000000001e-07,
+            1.0000000000000001e-07,
+            1.0000000000000001e-07,
+            9.999999999999999e-11,
+            9.999999999999999e-11,
+            9.999999999999999e-11
+          ],
+          "work_atol_m2_s2": 1e-08,
+          "rhs_evaluations": 103472,
+          "end_time_s": 604800.0,
+          "stopped_at_altitude_limit": false,
+          "output_samples": 10081,
+          "max_abs_work_energy_residual_m2_s2": 1.2417874131642748e-05,
+          "max_abs_relative_work_energy_residual": 4.21478363818504e-13,
+          "final_specific_energy_change_m2_s2": -6305.090880006552,
+          "final_specific_work_m2_s2": -6305.090871293471
+        }
+      },
+      "altitude_bounds_m": [
+        386412.4221299868,
+        400000.0
+      ],
+      "density_bounds_kg_m3": [
+        2e-12,
+        2.508303960319988e-12
+      ],
+      "drag_acceleration_bounds_m_s2": [
+        1.1969390799395799e-06,
+        1.5037246007181139e-06
+      ],
+      "checkpoints_elapsed_s": {
+        "86400": {
+          "available": true,
+          "position_difference_rtn_m": [
+            -211.4108971941787,
+            15036.3144577093,
+            -8.744467079771312
+          ],
+          "position_difference_norm_m": 15037.803147543682,
+          "altitude_difference_m": -194.68721843603998,
+          "osculating_semimajor_axis_difference_m": -231.30637453496456,
+          "last_complete_reference_orbit_window_s": [
+            77464.0508527857,
+            82997.19735022348
+          ],
+          "orbit_averaged_semimajor_axis_difference_m": -189.7644586544484
+        },
+        "259200": {
+          "available": true,
+          "position_difference_rtn_m": [
+            -1845.772868501117,
+            135592.65798268165,
+            82.7950569336972
+          ],
+          "position_difference_norm_m": 135605.24558921764,
+          "altitude_difference_m": -486.9029690735042,
+          "osculating_semimajor_axis_difference_m": -391.15008693002164,
+          "last_complete_reference_orbit_window_s": [
+            248991.5935538228,
+            254524.74015521366
+          ],
+          "orbit_averaged_semimajor_axis_difference_m": -597.484294552356
+        },
+        "604800": {
+          "available": true,
+          "position_difference_rtn_m": [
+            -42609.1112057165,
+            740698.1064869899,
+            -377.6701473053254
+          ],
+          "position_difference_norm_m": 741922.7479636228,
+          "altitude_difference_m": -1920.654925988987,
+          "osculating_semimajor_axis_difference_m": -511.57348794676363,
+          "last_complete_reference_orbit_window_s": [
+            597579.8438395156,
+            603112.990977359
+          ],
+          "orbit_averaged_semimajor_axis_difference_m": -1434.7187895644456
+        }
+      },
+      "convergence": {
+        "max_nominal_position_difference_m": 1.5647192715668956,
+        "max_nominal_velocity_difference_m_s": 0.001774923174832917,
+        "max_tighter_position_difference_m": 0.007000831461581585,
+        "max_tighter_velocity_difference_m_s": 7.940584997480513e-06,
+        "position_improvement_factor": 223.50477656169767
+      }
+    },
+    "1.0": {
+      "density_multiplier": 1.0,
+      "solver_levels": {
+        "nominal": {
+          "rtol": 1e-10,
+          "cartesian_atol_si": [
+            0.0001,
+            0.0001,
+            0.0001,
+            1e-07,
+            1e-07,
+            1e-07
+          ],
+          "work_atol_m2_s2": 1e-05,
+          "rhs_evaluations": 43457,
+          "end_time_s": 604800.0,
+          "stopped_at_altitude_limit": false,
+          "output_samples": 10081,
+          "max_abs_work_energy_residual_m2_s2": 0.018675850484214607,
+          "max_abs_relative_work_energy_residual": 6.338820011831187e-10,
+          "final_specific_energy_change_m2_s2": -12767.99331234023,
+          "final_specific_work_m2_s2": -12767.978348728386
+        },
+        "tighter": {
+          "rtol": 1e-12,
+          "cartesian_atol_si": [
+            1e-06,
+            1e-06,
+            1e-06,
+            9.999999999999999e-10,
+            9.999999999999999e-10,
+            9.999999999999999e-10
+          ],
+          "work_atol_m2_s2": 1.0000000000000001e-07,
+          "rhs_evaluations": 77522,
+          "end_time_s": 604800.0,
+          "stopped_at_altitude_limit": false,
+          "output_samples": 10081,
+          "max_abs_work_energy_residual_m2_s2": 0.00012098633851564955,
+          "max_abs_relative_work_energy_residual": 4.106429446891309e-12,
+          "final_specific_energy_change_m2_s2": -12767.97810806334,
+          "final_specific_work_m2_s2": -12767.97802567129
+        },
+        "reference": {
+          "rtol": 1e-13,
+          "cartesian_atol_si": [
+            1.0000000000000001e-07,
+            1.0000000000000001e-07,
+            1.0000000000000001e-07,
+            9.999999999999999e-11,
+            9.999999999999999e-11,
+            9.999999999999999e-11
+          ],
+          "work_atol_m2_s2": 1e-08,
+          "rhs_evaluations": 103487,
+          "end_time_s": 604800.0,
+          "stopped_at_altitude_limit": false,
+          "output_samples": 10081,
+          "max_abs_work_energy_residual_m2_s2": 1.290819636778906e-05,
+          "max_abs_relative_work_energy_residual": 4.3812052105443325e-13,
+          "final_specific_energy_change_m2_s2": -12767.978033531457,
+          "final_specific_work_m2_s2": -12767.978024291144
+        }
+      },
+      "altitude_bounds_m": [
+        385006.0373865729,
+        400000.0
+      ],
+      "density_bounds_kg_m3": [
+        4e-12,
+        5.1355848822309675e-12
+      ],
+      "drag_acceleration_bounds_m_s2": [
+        2.3938781598791598e-06,
+        3.0795690783686507e-06
+      ],
+      "checkpoints_elapsed_s": {
+        "86400": {
+          "available": true,
+          "position_difference_rtn_m": [
+            -457.10735214383203,
+            30106.40561229809,
+            -17.424483798562505
+          ],
+          "position_difference_norm_m": 30109.880598172986,
+          "altitude_difference_m": -390.06009712442756,
+          "osculating_semimajor_axis_difference_m": -463.3865561299026,
+          "last_complete_reference_orbit_window_s": [
+            77464.0508527857,
+            82997.19735022348
+          ],
+          "orbit_averaged_semimajor_axis_difference_m": -380.12850554380566
+        },
+        "259200": {
+          "available": true,
+          "position_difference_rtn_m": [
+            -6453.264190461705,
+            272057.9559465799,
+            173.35025984105596
+          ],
+          "position_difference_norm_m": 272134.5366962005,
+          "altitude_difference_m": -980.6833947626874,
+          "osculating_semimajor_axis_difference_m": -783.8483094861731,
+          "last_complete_reference_orbit_window_s": [
+            248991.5935538228,
+            254524.74015521366
+          ],
+          "orbit_averaged_semimajor_axis_difference_m": -1200.9555112607777
+        },
+        "604800": {
+          "available": true,
+          "position_difference_rtn_m": [
+            -168788.14612303925,
+            1484251.6173950357,
+            -1002.299099720025
+          ],
+          "position_difference_norm_m": 1493818.3646665069,
+          "altitude_difference_m": -3839.2288571996614,
+          "osculating_semimajor_axis_difference_m": -859.4085602220148,
+          "last_complete_reference_orbit_window_s": [
+            597579.8438395156,
+            603112.990977359
+          ],
+          "orbit_averaged_semimajor_axis_difference_m": -2904.703781059012
+        }
+      },
+      "convergence": {
+        "max_nominal_position_difference_m": 1.5770892482513585,
+        "max_nominal_velocity_difference_m_s": 0.00179013087901624,
+        "max_tighter_position_difference_m": 0.006853068506148035,
+        "max_tighter_velocity_difference_m_s": 7.778648846073201e-06,
+        "position_improvement_factor": 230.12891916030284
+      }
+    },
+    "2.0": {
+      "density_multiplier": 2.0,
+      "solver_levels": {
+        "nominal": {
+          "rtol": 1e-10,
+          "cartesian_atol_si": [
+            0.0001,
+            0.0001,
+            0.0001,
+            1e-07,
+            1e-07,
+            1e-07
+          ],
+          "work_atol_m2_s2": 1e-05,
+          "rhs_evaluations": 43472,
+          "end_time_s": 604800.0,
+          "stopped_at_altitude_limit": false,
+          "output_samples": 10081,
+          "max_abs_work_energy_residual_m2_s2": 0.018789213128911797,
+          "max_abs_relative_work_energy_residual": 6.37729672813431e-10,
+          "final_specific_energy_change_m2_s2": -26200.034805372357,
+          "final_specific_work_m2_s2": -26200.019815747466
+        },
+        "tighter": {
+          "rtol": 1e-12,
+          "cartesian_atol_si": [
+            1e-06,
+            1e-06,
+            1e-06,
+            9.999999999999999e-10,
+            9.999999999999999e-10,
+            9.999999999999999e-10
+          ],
+          "work_atol_m2_s2": 1.0000000000000001e-07,
+          "rhs_evaluations": 77552,
+          "end_time_s": 604800.0,
+          "stopped_at_altitude_limit": false,
+          "output_samples": 10081,
+          "max_abs_work_energy_residual_m2_s2": 0.00012238121053087525,
+          "max_abs_relative_work_energy_residual": 4.153773168407656e-12,
+          "final_specific_energy_change_m2_s2": -26200.019218619913,
+          "final_specific_work_m2_s2": -26200.01913465945
+        },
+        "reference": {
+          "rtol": 1e-13,
+          "cartesian_atol_si": [
+            1.0000000000000001e-07,
+            1.0000000000000001e-07,
+            1.0000000000000001e-07,
+            9.999999999999999e-11,
+            9.999999999999999e-11,
+            9.999999999999999e-11
+          ],
+          "work_atol_m2_s2": 1e-08,
+          "rhs_evaluations": 103517,
+          "end_time_s": 604800.0,
+          "stopped_at_altitude_limit": false,
+          "output_samples": 10081,
+          "max_abs_work_energy_residual_m2_s2": 1.2773489288520068e-05,
+          "max_abs_relative_work_energy_residual": 4.335483923017034e-13,
+          "final_specific_energy_change_m2_s2": -26200.01914061606,
+          "final_specific_work_m2_s2": -26200.019131627138
+        }
+      },
+      "altitude_bounds_m": [
+        382083.3883602042,
+        400000.0
+      ],
+      "density_bounds_kg_m3": [
+        8e-12,
+        1.0783872550119033e-11
+      ],
+      "drag_acceleration_bounds_m_s2": [
+        4.7877563197583196e-06,
+        6.469338548221554e-06
+      ],
+      "checkpoints_elapsed_s": {
+        "86400": {
+          "available": true,
+          "position_difference_rtn_m": [
+            -1052.298847030972,
+            60348.3048976952,
+            -34.58830549725462
+          ],
+          "position_difference_norm_m": 60357.488626014936,
+          "altitude_difference_m": -782.8817976014689,
+          "osculating_semimajor_axis_difference_m": -929.8872039793059,
+          "last_complete_reference_orbit_window_s": [
+            77464.0508527857,
+            82997.19735022348
+          ],
+          "orbit_averaged_semimajor_axis_difference_m": -762.6706659384072
+        },
+        "259200": {
+          "available": true,
+          "position_difference_rtn_m": [
+            -24178.580485460843,
+            547432.7531592275,
+            377.7643728032708
+          ],
+          "position_difference_norm_m": 547966.5735167657,
+          "altitude_difference_m": -1989.8269794732332,
+          "osculating_semimajor_axis_difference_m": -1575.58312970493,
+          "last_complete_reference_orbit_window_s": [
+            248991.5935538228,
+            254524.74015521366
+          ],
+          "orbit_averaged_semimajor_axis_difference_m": -2426.362779598683
+        },
+        "604800": {
+          "available": true,
+          "position_difference_rtn_m": [
+            -681443.7704042438,
+            2941186.9402054655,
+            -2938.8722414509393
+          ],
+          "position_difference_norm_m": 3019098.353222033,
+          "altitude_difference_m": -7678.746390985325,
+          "osculating_semimajor_axis_difference_m": -1274.4399377554655,
+          "last_complete_reference_orbit_window_s": [
+            597579.8438395156,
+            603112.990977359
+          ],
+          "orbit_averaged_semimajor_axis_difference_m": -5958.719283515587
+        }
+      },
+      "convergence": {
+        "max_nominal_position_difference_m": 1.6036431136314773,
+        "max_nominal_velocity_difference_m_s": 0.0018228084348555584,
+        "max_tighter_position_difference_m": 0.007238184391260994,
+        "max_tighter_velocity_difference_m_s": 8.228554714597191e-06,
+        "position_improvement_factor": 221.5532275701117
+      }
+    }
+  }
+}

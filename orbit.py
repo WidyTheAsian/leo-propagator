@@ -1,4 +1,4 @@
-"""Cartesian propagation with optional J2; the CLI runs milestone 1 in SI units."""
+"""Cartesian propagation with optional J2/drag; the CLI runs milestone 1 in SI."""
 
 import argparse
 import json
@@ -91,11 +91,19 @@ def analytical_state(times, inclination=0.0):
 
 
 def propagate(rtol=RTOL, atol=ATOL, *, state0=None, duration=DURATION,
-              sample_interval=SAMPLE_INTERVAL, j2=0.0):
+              sample_interval=SAMPLE_INTERVAL, j2=0.0, drag=None,
+              stop_altitude=None, dense_output=False, work_atol=1e-5):
     """Integrate Cartesian states in SI; defaults preserve milestone 1.
 
-    J2 = 0 disables the perturbation. Always include the final time, even when
-    the duration is not an integer multiple of the output sample interval.
+    J2 = 0 disables that perturbation. A drag model supplies acceleration and
+    a default minimum altitude [m]. With active drag, also integrate specific
+    work W' = v dot a_drag, with W(0) = 0 and work_atol [m^2/s^2]. Returned y
+    and sol remain six-component Cartesian states; work_m2_s2 and work_sol
+    provide the integrated work. Zero drag uses the original six-state solver.
+
+    A downward crossing of stop_altitude terminates successfully at the event,
+    including the event state even when it falls between output times. Initial
+    states on or below the limit are rejected. Otherwise include the duration.
     """
     if not np.isfinite(duration) or duration <= 0.0:
         raise ValueError("Duration must be finite and positive.")
@@ -103,15 +111,73 @@ def propagate(rtol=RTOL, atol=ATOL, *, state0=None, duration=DURATION,
         raise ValueError("Sample interval must be finite and positive.")
     if state0 is None:
         state0 = initial_state()
+    state0 = np.asarray(state0, dtype=float)
+    if state0.shape != (6,) or not np.all(np.isfinite(state0)):
+        raise ValueError("Initial state must contain six finite Cartesian components.")
+    if np.linalg.norm(state0[:3]) == 0.0:
+        raise ValueError("Initial position must have nonzero radius.")
+    active_drag = drag is not None and drag.enabled
+    if stop_altitude is None and drag is not None:
+        stop_altitude = drag.min_altitude_m
+    events = None
+    if stop_altitude is not None:
+        if not np.isfinite(stop_altitude) or stop_altitude < 0.0:
+            raise ValueError("Stopping altitude must be finite and nonnegative.")
+        if np.linalg.norm(state0[:3]) - EARTH_RADIUS <= stop_altitude:
+            raise ValueError("Initial altitude must be above the stopping altitude.")
+
+        def lower_altitude(t, state, gravity_j2):
+            return np.linalg.norm(state[:3]) - EARTH_RADIUS - stop_altitude
+
+        lower_altitude.terminal = True
+        lower_altitude.direction = -1
+        events = lower_altitude
+
+    rhs = two_body_rhs
+    solver_atol = atol
+    if active_drag:
+        if not np.isfinite(work_atol) or work_atol <= 0.0:
+            raise ValueError("Specific-work absolute tolerance must be positive and finite.")
+        solver_atol = np.append(np.broadcast_to(atol, (6,)), work_atol)
+        state0 = np.append(state0, 0.0)
+
+        def rhs(t, state, gravity_j2):
+            derivative = two_body_rhs(t, state[:6], gravity_j2)
+            acceleration = drag.acceleration(state[:3], state[3:6])
+            derivative[3:] += acceleration
+            return np.append(derivative, np.dot(state[3:6], acceleration))
+
     times = np.append(np.arange(0.0, duration, sample_interval), duration)
     solution = solve_ivp(
-        two_body_rhs, (0.0, duration), state0, args=(j2,),
-        method="DOP853", t_eval=times, rtol=rtol, atol=atol,
+        rhs, (0.0, duration), state0, args=(j2,), events=events,
+        method="DOP853", t_eval=times, rtol=rtol, atol=solver_atol,
+        dense_output=dense_output,
+        # Resolve altitude crossings on an orbital timescale when a guard is used.
+        max_step=PERIOD / 16.0 if events is not None else np.inf,
     )
     if not solution.success:
         raise RuntimeError(f"Orbit integration failed: {solution.message}")
-    if solution.t[-1] != duration or not np.all(np.isfinite(solution.y)):
+    solution.terminated_early = solution.status == 1
+    if solution.terminated_early:
+        event_time, event_state = solution.t_events[0][-1], solution.y_events[0][-1]
+        if event_time != solution.t[-1]:
+            solution.t = np.append(solution.t, event_time)
+            solution.y = np.column_stack((solution.y, event_state))
+    if ((not solution.terminated_early and solution.t[-1] != duration)
+            or not np.all(np.isfinite(solution.y))):
         raise RuntimeError("Integration did not return a finite full-duration trajectory.")
+    solution.work_m2_s2 = solution.y[6].copy() if active_drag else np.zeros(len(solution.t))
+    if dense_output:
+        dense = solution.sol
+        solution.work_sol = (lambda t: dense(t)[6]) if active_drag else (
+            lambda t: np.zeros_like(np.asarray(t), dtype=float))
+        if active_drag:
+            solution.sol = lambda t: dense(t)[:6]
+    if active_drag:
+        solution.y = solution.y[:6]
+        if solution.y_events is not None:
+            solution.y_events = [states[:, :6] if states.size else np.empty((0, 6))
+                                 for states in solution.y_events]
     return solution
 
 
