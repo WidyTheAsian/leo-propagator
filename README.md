@@ -1,7 +1,7 @@
 # leo-propagator
 
 A learning project for building and understanding satellite orbit propagation
-in Python, with an eventual comparison against Orekit. The implementation is
+in Python, with an independent comparison against Orekit. The implementation is
 kept small so that the physical model, numerical integration and verification
 can be read and explained directly.
 
@@ -21,6 +21,11 @@ seven-day density-sensitivity study compares J2-only with density factors
 0.5, 1 and 2. Results are separate under `outputs/drag/`. This is a learning
 experiment, not a validated space-weather forecast.
 
+**Milestone 4 adds optional Orekit comparison:** explicitly matched GCRF/TAI
+initial conditions, central/J2 gravity and spherical exponential drag, force
+checks before integration, and independent tolerance studies. Results are
+saved under `outputs/orekit/`. Milestones 1–3 still run without Java or Orekit.
+
 ## Implemented capabilities
 
 - Integrate all six Cartesian position and velocity components for 86,400 s
@@ -38,6 +43,8 @@ experiment, not a validated space-weather forecast.
 - Compare drag-induced decay, density and acceleration histories, and position
   differences in the J2-only RTN frame; verify drag work against energy change
   and convergence for every density case, with 17 additional tests.
+- Compare with Orekit's own force models and Hipparchus integrator, verify
+  frame/atmosphere matching, and run 11 optional Orekit tests.
 
 ## Setup and run
 
@@ -100,7 +107,9 @@ windows or `--output-dir path` to select the output directory. `orbit.py`
 runs the original 24-hour equatorial two-body example. `j2.py` and `drag.py`
 default to seven days; `--days` selects another positive duration. Each example
 performs its own tolerance comparison. Use `python -m unittest -v test` to run only
-the four original tests, or `python -m unittest -v` to run all 34.
+the four original tests, or `python -m unittest -v` for the full suite. In the
+base environment, 34 tests pass and 11 optional Orekit tests are skipped.
+In the separate Orekit environment described below, all 45 tests run and pass.
 
 ## Files and outputs
 
@@ -117,6 +126,12 @@ the four original tests, or `python -m unittest -v` to run all 34.
 - `drag.py`: density experiments, nodal-period averaging, RTN differences,
   work-energy diagnostics, convergence and plots.
 - `test_drag.py`: 17 drag, guard, averaging, geometry and seven-day checks.
+- `orekit_backend.py`: optional wrapper/JVM setup, uniform rotating frame,
+  built-in Orekit gravity/atmosphere/drag and numerical Cartesian propagation.
+- `orekit_compare.py`: smoke/force checks, ordered comparisons, independently
+  tightened solvers, checkpoint reports and figures.
+- `test_orekit.py`: 11 optional model, geometry, stopping and trajectory checks.
+- `requirements-orekit.txt`: pinned packages for the isolated comparison environment.
 - `requirements.txt`: NumPy, SciPy and Matplotlib versions used for this milestone.
 - `outputs/orbit_and_altitude.png`: the numerical orbit overlaid on the exact
   circle, and altitude versus elapsed time.
@@ -127,6 +142,8 @@ the four original tests, or `python -m unittest -v` to run all 34.
   `outputs/j2/validation.json`: separate milestone 2 figures and numerical report.
 - `outputs/drag/decay.png`, `atmosphere.png`, `rtn.png`, `validation.png` and
   `validation.json`: separate milestone 3 figures and numerical report.
+- `outputs/orekit/`: five Cartesian/RTN comparison figures, a convergence
+  figure and a full force/checkpoint/tolerance report in `validation.json`.
 
 ![Orbit and altitude](outputs/orbit_and_altitude.png)
 
@@ -353,9 +370,9 @@ drag matter for an actual low Earth orbit. Milestone 1 omits both; milestone 2
 includes J2 but still omits drag and higher gravity harmonics.
 Milestone 3 includes drag with a deliberately simple illustrative atmosphere;
 it does not estimate the actual density or weather along a real orbit.
-This project has not been compared with tracking observations or Orekit yet;
-the small numerical errors are not a claim of millimetre accuracy for real
-satellite position predictions.
+Milestone 4 compares with Orekit using these same idealised force models.
+There has been no comparison with tracking observations; small numerical
+errors do not establish millimetre accuracy for real satellite predictions.
 
 ## Reading and explaining the code
 
@@ -904,13 +921,362 @@ properties, as discussed in
 Factors 0.5 and 2 are prescribed experiments, not a confidence interval or
 forecast ensemble. Small solver errors verify these equations; they do not
 validate the density choices or establish real-world prediction accuracy.
-No tracking observations, operational atmosphere or Orekit comparison have
-been used yet.
+No tracking observations or operational atmosphere have been used. Milestone 4
+adds an Orekit implementation comparison using the same illustrative profile.
 
-## Remaining milestone
+## Milestone 4: independent comparison with Orekit
 
-Milestones 1–3 are implemented. **Orekit comparison** remains future work:
-match the initial Cartesian state, inertial frame, epoch, Earth constants,
-force models (including density and relative atmospheric velocity) and output
-times; compare trajectories while accounting for numerical tolerances and
-model differences.
+### Optional wrapper and tested Windows environment
+
+The maintained [JPype wrapper documentation](https://pypi.org/project/orekit-jpype/13.1.9.0/)
+was checked before installation. This wrapper loads Orekit's Java classes into
+an in-process JVM and supports implementing Java interfaces in Python. The
+chosen release requires JPype 1.7.1; Java 11 or later is supported. The tested
+64-bit Python/Java combination and all installed Python packages are recorded
+in `requirements-orekit.txt` and the saved validation report.
+
+| Component | Version actually used |
+| --- | --- |
+| Windows Python | 3.9.13, 64-bit |
+| Orekit JPype wrapper | 13.1.9.0 |
+| JPype | 1.7.1 |
+| Bundled Orekit Java library | 13.1.9 |
+| Bundled Hipparchus integrators | 4.0.3 |
+| Java runtime | Oracle JDK 17.0.3+8-LTS-111, 64-bit |
+| NumPy / SciPy / Matplotlib | 2.0.2 / 1.13.1 / 3.9.4 |
+
+The comparison uses an isolated `.venv-orekit/`, which Git ignores. The
+original `.conda/`, `requirements.txt` and `environment.yml` remain unchanged.
+On the development machine the system Python launcher's venv failed; the
+working Conda Python was used to create the venv. These are the tested Windows
+PowerShell commands, assuming the existing `.conda` environment from setup
+above and an installed 64-bit JDK at the stated location:
+
+```powershell
+# Use the working Python 3.9.13 and its Conda DLL paths to create a separate venv.
+$env:PATH = "$PWD\.conda;$PWD\.conda\Library\bin;$PWD\.conda\Scripts;$env:PATH"
+.\.conda\python.exe -m venv .venv-orekit
+$env:JAVA_HOME = "C:\Program Files\Java\jdk-17.0.3"
+$env:PATH = "$env:JAVA_HOME\bin;$env:PATH"
+$env:MPLCONFIGDIR = "$PWD\.mplconfig"
+.\.venv-orekit\Scripts\python.exe -m pip install -r requirements-orekit.txt
+.\.venv-orekit\Scripts\python.exe orekit_compare.py --smoke-only
+.\.venv-orekit\Scripts\python.exe orekit_compare.py --forces-only
+.\.venv-orekit\Scripts\python.exe orekit_compare.py
+.\.venv-orekit\Scripts\python.exe -m unittest -v
+.\.venv-orekit\Scripts\python.exe -m pip check
+```
+
+Set `JAVA_HOME`, Java's bin directory and `MPLCONFIGDIR` in each new shell
+used for Orekit. With a healthy standalone Python installation,
+`py -3.9 -m venv .venv-orekit` can replace the Conda-based creation command.
+A different compatible Java 17 build needs its own `JAVA_HOME`; check the
+runtime printed by `--smoke-only` when assessing reproducibility. Python and
+Java must have matching 64-bit architectures. The code starts the JVM before
+importing Java classes. A JVM cannot be restarted within the same Python
+process; a new script invocation starts a new process.
+
+`--smoke-only` imports the wrapper and propagates a central-gravity orbit
+numerically for 60 s, then compares with the circular solution. It passed
+with maximum position error **1.863264e-8 m** and velocity error
+**1.932676e-12 m/s** on the 10 s grid. `--forces-only` runs all force/environment
+checks without a long integration. The full command repeats both checks and
+runs the cases in order: central, J2, nominal drag, half density, double density.
+Each case must pass a reference-level consistency gate before the next case.
+Use `--show` or `--output-dir path` as in the other scripts.
+
+No Orekit data download is needed for this experiment. GCRF and TAI are
+built-in, gravity coefficients are supplied explicitly, and the atmosphere
+uses the prescribed ideal rotation. No UTC conversion, EOP, solar ephemeris
+or operational density model is requested. Orekit remains optional: the
+base environment can run all original scripts and tests, and the new tests
+skip explicitly when the wrapper is absent.
+
+### Common initial conditions, axes and epoch
+
+For this comparison, interpret the project's existing ideal ECI Cartesian
+components as **GCRF** components in both propagators. GCRF is the common
+Earth-centred, quasi-inertial frame returned by `FramesFactory.getGCRF()`.
+The toy gravity symmetry axis and rotation vector are defined to be its
+fixed `+z` direction; they are not transformed to the actual time-dependent
+terrestrial pole. This specifies the comparison frame without changing any
+milestone 1–3 calculation or stored output.
+
+Both implementations start at **2026-01-01 00:00:00 TAI**. SciPy's `t=0`
+corresponds to Orekit's `AbsoluteDate` at that epoch; all output times are
+elapsed SI seconds. TAI avoids needing a leap-second table. The static models
+do not depend on the particular epoch beyond defining atmosphere-frame angle.
+
+Every new comparison uses the milestone 3 inclined state:
+
+$$
+\mathbf r_0=(6771000,0,0)\ \mathrm m,\qquad
+\mathbf v_0=(0,4765.8176194107145,6012.965361426416)\ \mathrm{m/s}.
+$$
+
+The central comparison is inclined at 51.6 degrees too, so the same state is
+used across all new cases. The original milestone 1 CLI remains equatorial.
+The circular analytical comparison is rotated by that inclination. Position,
+velocity, mass and all force constants are passed without unit conversion or
+retuning of the initial speed.
+
+### Matching the built-in force models
+
+Orekit evaluates **its own force implementations**. No Python acceleration
+or density function is called by an Orekit force. `UniformRotation` implements
+only the frame transformation through Orekit's `TransformProvider` interface.
+The API conventions were checked against the
+[official Orekit 13.1.9 Java sources](https://repo.maven.apache.org/maven2/org/orekit/orekit/13.1.9/orekit-13.1.9-sources.jar)
+when the hosted Javadoc was inaccessible.
+
+| Quantity or model choice | Matched definition |
+| --- | --- |
+| Central gravity | `mu = 3.986004418e14 m³/s²`, one `NewtonianAttraction` |
+| J2 gravity reference radius | 6,378,137 m |
+| Positive J2 | 1.08263e-3 |
+| Fully normalized coefficient | `Cbar_20 = -J2/sqrt(5) = -4.8416685489611946e-4` |
+| Enabled harmonics | Degree 2, order 0 only; other non-central coefficients zero |
+| J2 symmetry axis | Fixed GCRF z; gravity model's body frame is GCRF |
+| Altitude/density reference radius | 6,371,000 m; `h = norm(r) - R_E` |
+| Orekit shape | `OneAxisEllipsoid(R_E, 0.0, atmosphere_frame)`: flattening exactly zero |
+| Nominal reference density | 4e-12 kg/m³, multiplied by 0.5, 1 or 2 |
+| Reference altitude / scale height | 400,000 m / 60,000 m |
+| Density implementation | Orekit `SimpleExponentialAtmosphere` on the sphere |
+| Atmosphere rotation | Constant `omega = (0,0,7.2921150e-5) rad/s` in GCRF |
+| Atmospheric velocity | Built-in `getVelocity`, equivalent to `omega cross r` |
+| Spacecraft | Constant 1,000 kg mass, 10 m² effective area, Cd = 2.2 |
+| Drag implementation | Orekit `DragForce` with `IsotropicDrag` |
+| Termination | Stop on downward spherical-altitude crossing at 200,000 m |
+| Output grid | Central: 0–86,400 s every 10 s; others: 0–604,800 s every 60 s |
+
+`GravityFieldFactory.getNormalizedProvider` constructs a constant degree-2,
+order-0 field directly from coefficients; no Earth gravity file is loaded.
+For fully normalized zonal polynomials, `Pbar_20 = sqrt(5)*P2`, so positive
+J2 means **negative** `Cbar_20 = -J2/sqrt(5)`. Using the unnormalized `-J2`
+in this provider would make the J2 force too large by `sqrt(5)`.
+
+`HolmesFeatherstoneAttractionModel` contributes the **non-central** gravity
+terms. `NumericalPropagator.setIgnoreCentralAttraction(True)` disables automatic
+central-force addition, then one explicit `NewtonianAttraction` is added.
+The force list is checked in tests. C00 is set to 1 in the provider, but is
+not applied as another central acceleration by Holmes–Featherstone. There
+are no tides, degree-1 terms, tesseral terms or higher zonal harmonics.
+
+The atmosphere frame shares GCRF's origin and z axis and coincides with its
+axes at the epoch. Its parent-to-child transform is a **passive** rotation
+by `omega*t` about z: an inertial `+x` position has rotating-frame components
+`r*(cos(omega*t), -sin(omega*t), 0)`. The transform also supplies the positive
+angular rate. Orekit then transforms a point stationary in the atmosphere
+back to GCRF and obtains `omega cross r` through its own atmosphere velocity
+implementation. Static, kinematic and field interface methods are implemented
+explicitly; this also avoids an overloaded default-method dispatch error
+encountered with JPype during development.
+
+Zero flattening makes Orekit's body height the required spherical height.
+No ellipsoidal height or ITRF rotation is substituted. Forcing a full Earth
+rotation frame here would introduce a different physical model and extra data
+dependencies. The gravity harmonic's equatorial reference radius remains
+distinct from the atmosphere/altitude radius, exactly as in milestones 2–3.
+
+`AltitudeDetector` uses the same sphere and its default stop-on-descending
+behavior. Its maximum checking interval is `PERIOD/16 = 346.553443 s`, with
+root convergence threshold 1e-9 s. Both propagators reject initial states at
+or below the limit and include their terminal state. The comparisons use the
+common available interval and never extrapolate a stopped Orekit ephemeris.
+All main cases reach their requested durations; a separate 395,000 m guard
+test checks boundary states and event-time agreement.
+
+### Force and atmosphere checks before integration
+
+Five shared Cartesian states cover the ascending and opposite equators,
+northern/southern oblique positions, and a near-polar position. Their altitudes
+include 390,000, 400,000 and 430,000 m. Each is evaluated at elapsed times
+0, 86,400 and 604,800 s for all three density multipliers: **45 checks**.
+Central, J2 and drag accelerations are compared separately, as are spherical
+altitude, density and atmospheric velocity. A mismatch stops the experiment
+before a long propagation; these gates are consistency thresholds, not bounds
+on trajectory accuracy.
+
+| Shared-state quantity | Maximum measured difference | Gate |
+| --- | ---: | ---: |
+| Central acceleration [m/s²] | 2.035072e-15 | 2e-12 |
+| J2 acceleration [m/s²] | 9.055522e-18 | 2e-13 |
+| Drag acceleration [m/s²] | 2.601960e-19 | 1e-16 |
+| Spherical altitude [m] | 3.026798e-9 | 1e-6 |
+| Relative density difference | 5.042896e-14 | 1e-12 |
+| Atmospheric velocity difference [m/s] | 5.934627e-13 | 1e-9 |
+
+These differences are consistent with floating-point evaluation and frame
+roundoff. In particular, the checked atmosphere velocity establishes rotation
+sign and rate independently of the drag acceleration check. The raw states,
+both libraries' force vectors, densities and velocities are retained in the
+JSON report. No discrepancy required changing the intended force equations.
+
+### Propagators and independent tolerance experiments
+
+In Orekit, a `CartesianOrbit` assigns frame, epoch and mu to the initial
+position/velocity; `SpacecraftState` adds spacecraft mass. `NumericalPropagator`
+holds the force list and integrates **Cartesian** components with the
+Hipparchus `DormandPrince853Integrator`. Setting `OrbitType.CARTESIAN` avoids
+propagating singular Keplerian angles. An ephemeris generator records its
+accepted-step interpolation, allowing positions and velocities to be extracted
+at the same output times used for SciPy. Those ephemeris samples do not trigger
+new force integration.
+
+Both solvers adapt their internal steps. Orekit's seven primary components
+are position, velocity and **mass**, with zero mass derivative. SciPy's drag
+run has position, velocity and **specific drag work**, which has no feedback
+into the physical state. Neither includes variable attitude or mass loss.
+
+| Level | Cartesian `rtol` | Position `atol` [m] | Velocity `atol` [m/s] | Orekit mass `atol` [kg] | SciPy drag work `atol` [m²/s²] |
+| --- | ---: | ---: | ---: | ---: | ---: |
+| Nominal | 1e-10 | 1e-4 | 1e-7 | 1e-9 | 1e-5 |
+| Tighter | 1e-12 | 1e-6 | 1e-9 | 1e-11 | 1e-7 |
+| Numerical reference | 1e-13 | 1e-7 | 1e-10 | 1e-12 | 1e-8 |
+
+Orekit uses the Cartesian `rtol` on all seven components, a 0.001 s minimum
+step and 346.553443 s maximum step. SciPy uses its existing drag-work equations
+and the same maximum step when the altitude guard is enabled. Component
+scaling, error norms and step-control details differ between libraries.
+Matching tolerance numbers does not imply identical accuracy.
+
+For every case, the report contains five cross-library comparisons: both
+nominal, **only SciPy tighter**, **only Orekit tighter**, both tighter and
+both reference. It also compares nominal and tighter runs with each library's
+own reference. Thus one solver's tolerance can change while the other remains
+fixed. Force matching is checked first; changing numerical error while keeping
+the forces fixed distinguishes integration effects from model mismatch.
+
+### Actual trajectory differences
+
+The values below are norms of **Orekit minus SciPy** Cartesian differences.
+Each cross-library RTN frame follows the SciPy trajectory at the indicated
+tolerance level, using the same R/T/N definitions as milestone 3. Orekit is
+not designated as exact truth. Checkpoints use exact elapsed times; maxima
+refer to the shared saved grid, including dense interpolation, and are not
+rigorous bounds between samples.
+
+Checkpoint results with **both solvers tighter (`rtol=1e-12`)**:
+
+| Model | Elapsed time [s] | Position difference [m] | Velocity difference [m/s] |
+| --- | ---: | ---: | ---: |
+| Central | 86,400 | 3.105387e-6 | 3.604511e-9 |
+| J2 | 86,400 | 7.836191e-6 | 8.224018e-9 |
+| J2 | 259,200 | 1.021348e-4 | 1.156841e-7 |
+| J2 | 604,800 | 8.261475e-4 | 9.365627e-7 |
+| J2 + drag, density x1 | 86,400 | 1.142594e-5 | 1.302516e-8 |
+| J2 + drag, density x1 | 259,200 | 9.719984e-5 | 1.102567e-7 |
+| J2 + drag, density x1 | 604,800 | 4.472369e-4 | 5.078548e-7 |
+| J2 + drag, density x0.5 | 86,400 | 9.000585e-6 | 1.032361e-8 |
+| J2 + drag, density x0.5 | 259,200 | 4.828454e-5 | 5.497235e-8 |
+| J2 + drag, density x0.5 | 604,800 | 2.110493e-4 | 2.393512e-7 |
+| J2 + drag, density x2 | 86,400 | 3.095509e-6 | 3.408477e-9 |
+| J2 + drag, density x2 | 259,200 | 2.323526e-5 | 2.633888e-8 |
+| J2 + drag, density x2 | 604,800 | 1.643102e-4 | 1.867115e-7 |
+
+86,400 s is 24 hours, 259,200 s is 72 hours, and 604,800 s is seven days.
+The central experiment ends at 24 hours; its later checkpoints are explicitly
+unavailable in the report. All other cases have 10,081 shared output times;
+the central case has 8,641.
+
+Maximum position differences over each full run [m]:
+
+| Model | Both nominal | Both tighter | Both reference |
+| --- | ---: | ---: | ---: |
+| Central, 24 hours | 2.006717e-3 | 1.992969e-5 | 2.131822e-6 |
+| J2, seven days | 1.327880e-1 | 8.262973e-4 | 2.706347e-4 |
+| Drag x1, seven days | 7.648446e-4 | 4.472369e-4 | 1.438649e-4 |
+| Drag x0.5, seven days | 5.699617e-4 | 2.110858e-4 | 1.992881e-4 |
+| Drag x2, seven days | 6.703450e-4 | 1.643102e-4 | 2.157987e-4 |
+
+Maximum velocity differences over each full run [m/s]:
+
+| Model | Both nominal | Both tighter | Both reference |
+| --- | ---: | ---: | ---: |
+| Central, 24 hours | 9.771297e-7 | 6.183878e-9 | 1.252599e-9 |
+| J2, seven days | 1.505360e-4 | 9.365627e-7 | 3.070375e-7 |
+| Drag x1, seven days | 7.670160e-7 | 5.078548e-7 | 1.634181e-7 |
+| Drag x0.5, seven days | 5.540577e-7 | 2.393512e-7 | 2.264177e-7 |
+| Drag x2, seven days | 6.779232e-7 | 1.867115e-7 | 2.451680e-7 |
+
+![Central gravity: Cartesian and SciPy-reference RTN differences](outputs/orekit/central.png)
+![J2: Cartesian and SciPy-reference RTN differences](outputs/orekit/j2.png)
+![Nominal drag: Cartesian and SciPy-reference RTN differences](outputs/orekit/drag_1.png)
+![Half density: Cartesian and SciPy-reference RTN differences](outputs/orekit/drag_0.5.png)
+![Double density: Cartesian and SciPy-reference RTN differences](outputs/orekit/drag_2.png)
+
+### Interpreting agreement and convergence
+
+The strikingly small nominal drag discrepancy does **not** mean either
+nominal trajectory is accurate to that difference. SciPy DOP853 and Hipparchus
+Dormand–Prince 8(5,3) are independent implementations of the **same RK family**.
+Their accumulated numerical biases can be correlated and cancel in a
+cross-library subtraction. For nominal-density drag:
+
+| Comparison | Maximum position difference over seven days [m] |
+| --- | ---: |
+| Both nominal, Orekit versus SciPy | 0.000764845 |
+| Tighten only SciPy, keep Orekit nominal | 1.570871 |
+| Tighten only Orekit, keep SciPy nominal | 1.569789 |
+| SciPy nominal versus its own reference | 1.577089 |
+| Orekit nominal versus its own reference | 1.577580 |
+| SciPy tighter versus its own reference | 0.006853069 |
+| Orekit tighter versus its own reference | 0.007156575 |
+
+Tightening one solver reveals the other solver's integration error that was
+mostly cancelled when both were nominal. The independent nominal-to-tighter
+position differences shrink by factors **230.13** for SciPy and **220.44** for
+Orekit in this case. Both position and velocity differences shrink by more
+than 10 times in each library for every case. The drag convergence factors
+span roughly 220–230; the central case gives 67.91 and 71.35.
+
+The reference level has finite error too. In the central case its maximum
+position errors relative to the exact inclined circle are **8.757278e-6 m**
+for SciPy and **9.718192e-6 m** for Orekit, while the cross-library difference
+is only 2.131822e-6 m. This independently demonstrates why agreement can be
+closer than either trajectory's error. Cross-library differences need not
+decrease monotonically: drag x2's reference-to-reference difference is slightly
+larger than its tighter-to-tighter difference. Error cancellation and changing
+step histories affect that difference; it is not an absolute error estimator.
+
+![Independent tolerance convergence in both implementations](outputs/orekit/convergence.png)
+
+All **45 tests pass** in the isolated Orekit environment, including the 34
+unchanged previous tests. The original environment passes those 34 and skips
+the 11 optional tests. Both environments pass `pip check`. New checks cover
+force/density/velocity matching, normalization and force lists, rotation sign
+and field transforms, zero-density equivalence in Orekit, configurable drag
+properties, spherical stopping events, matching initial states and times,
+constant mass, circular-reference errors, independent convergence and RTN
+norm consistency. Earlier code and outputs are preserved unchanged.
+
+The smoke test, force preflight, exact model choices, per-library tolerances,
+force lists, RHS evaluation counts, all checkpoint values and every tolerance
+combination are in [`outputs/orekit/validation.json`](outputs/orekit/validation.json).
+Read `OrekitModel` for model construction, then `check_force_models`, `run_case`
+and `run_comparisons`. The physics is checked at shared states before trajectory
+differences are interpreted; the tolerance experiment then measures numerical
+sensitivity while holding the physical model fixed.
+
+### What this comparison establishes
+
+The results support consistency between the project's equations and Orekit's
+built-in implementations **for these matched ideal models and initial states**.
+They can expose sign, normalization, reference-radius, frame, relative-velocity
+or integration mistakes. They do not make Orekit exact truth, prove error
+bounds for all orbits, or validate the chosen density against the real
+thermosphere. Both integrations use the same RK family, so their algorithmic
+errors are not fully independent even though the force and integrator code
+come from separate implementations.
+
+This remains an illustrative density-sensitivity study. No tracking data,
+space-weather forecast or realistic Earth-orientation/gravity/atmosphere
+model has been introduced. Matching simplified assumptions can yield close
+agreement while both predictions omit the same real forces and uncertainties.
+
+## Further work
+
+Milestones 1–4 are implemented. Possible next studies include a different
+integration family to examine correlated numerical error, then an explicitly
+scoped operational density model or additional gravity terms, with observational
+validation kept distinct from numerical implementation checks.

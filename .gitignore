@@ -1,6 +1,7 @@
 # Local Python environments and Conda installation/package cache
 .conda/
 .venv/
+.venv-orekit/
 conda/
 
 # Python bytecode and caches (includes *.pyc)

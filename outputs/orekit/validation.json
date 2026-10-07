@@ -1,0 +1,5004 @@
+{
+  "purpose": "Independent implementation comparison for matched ideal models; Orekit is not exact truth or real-world validation.",
+  "versions": {
+    "python": "3.9.13",
+    "numpy": "2.0.2",
+    "scipy": "1.13.1",
+    "matplotlib": "3.9.4",
+    "wrapper": "13.1.9.0",
+    "jpype": "1.7.1",
+    "orekit": "13.1.9",
+    "hipparchus": "4.0.3",
+    "java": "17.0.3+8-LTS-111",
+    "java_vendor": "Oracle Corporation",
+    "java_vm": "Java HotSpot(TM) 64-Bit Server VM"
+  },
+  "matching": {
+    "inertial_frame": "GCRF, same Cartesian components interpreted in both implementations.",
+    "epoch": "2026-01-01T00:00:00 TAI",
+    "time_definition": "Elapsed SI seconds from the common TAI epoch.",
+    "initial_state_si": [
+      6771000.0,
+      0.0,
+      0.0,
+      0.0,
+      4765.8176194107145,
+      6012.965361426416
+    ],
+    "inclination_rad": 0.9005898940290741,
+    "mu_m3_s2": 398600441800000.0,
+    "j2": 0.00108263,
+    "gravity_reference_radius_m": 6378137.0,
+    "normalized_c20": -0.00048416685489611946,
+    "coefficient_convention": "Fully normalized Pbar20=sqrt(5)*P2; Cbar20=-J2/sqrt(5). Degree 2/order 0 only; all other non-central coefficients zero.",
+    "central_gravity": "One explicit NewtonianAttraction; automatic addition disabled. Holmes-Featherstone is non-central only.",
+    "spherical_altitude_radius_m": 6371000.0,
+    "orekit_body_shape": "OneAxisEllipsoid with flattening exactly zero (sphere). No ellipsoidal substitution.",
+    "atmosphere_frame": "Uniform passive rotation about GCRF +z; axes coincide at epoch. No ITRF, EOP, precession/nutation or winds.",
+    "spacecraft_and_nominal_atmosphere": {
+      "mass_kg": 1000.0,
+      "cd": 2.2,
+      "area_m2": 10.0,
+      "rho_ref_kg_m3": 4e-12,
+      "h_ref_m": 400000.0,
+      "scale_height_m": 60000.0,
+      "density_multiplier": 1.0,
+      "omega_rad_s": 7.292115e-05,
+      "min_altitude_m": 200000.0
+    },
+    "termination": "Stop on descending spherical-altitude crossing at 200000 m; reject initial state at/below limit. Compare only common available times.",
+    "orekit_event_threshold_s": 1e-09,
+    "orekit_min_step_s": 0.001,
+    "orekit_max_step_s": 346.55344349879954,
+    "scipy_guard_max_step_s": 346.55344349879954,
+    "data_files": "None needed: built-in GCRF/TAI, explicitly supplied constants, ideal rotation and toy atmosphere.",
+    "rtol_levels": {
+      "nominal": 1e-10,
+      "tighter": 1e-12,
+      "reference": 1e-13
+    },
+    "integrators": "SciPy DOP853 and Hipparchus DormandPrince853Integrator; independent implementations of the same RK family."
+  },
+  "smoke_test": {
+    "versions": {
+      "wrapper": "13.1.9.0",
+      "jpype": "1.7.1",
+      "orekit": "13.1.9",
+      "hipparchus": "4.0.3",
+      "java": "17.0.3+8-LTS-111",
+      "java_vendor": "Oracle Corporation",
+      "java_vm": "Java HotSpot(TM) 64-Bit Server VM"
+    },
+    "duration_s": 60.0,
+    "force_models": [
+      "NewtonianAttraction"
+    ],
+    "max_position_error_vs_circular_m": 1.8632635029888138e-08,
+    "max_velocity_error_vs_circular_m_s": 1.9326762412674725e-12,
+    "final_mass_kg": 1000.0
+  },
+  "force_preflight": {
+    "passed": true,
+    "states_si": {
+      "ascending_equator": [
+        6771000.0,
+        0.0,
+        0.0,
+        0.0,
+        4765.8176194107145,
+        6012.965361426416
+      ],
+      "opposite_equator": [
+        -6771000.0,
+        -0.0,
+        -0.0,
+        -0.0,
+        -4765.8176194107145,
+        -6012.965361426416
+      ],
+      "north_oblique": [
+        3427963.075695106,
+        2742370.4605560848,
+        5141944.613542658,
+        -5000.0,
+        3500.0,
+        4000.0
+      ],
+      "south_oblique": [
+        3068129.936792969,
+        -4772646.568344618,
+        -3749936.589413629,
+        5000.0,
+        3000.0,
+        -4000.0
+      ],
+      "near_pole": [
+        1000.0,
+        0.0,
+        6770999.926155663,
+        7400.0,
+        1000.0,
+        0.0
+      ]
+    },
+    "limits": {
+      "central_acceleration_m_s2": 2e-12,
+      "j2_acceleration_m_s2": 2e-13,
+      "drag_acceleration_m_s2": 1e-16,
+      "altitude_m": 1e-06,
+      "relative_density": 1e-12,
+      "atmospheric_velocity_m_s": 1e-09
+    },
+    "max_differences": {
+      "central_acceleration_m_s2": 2.0350724194510405e-15,
+      "j2_acceleration_m_s2": 9.055522398700297e-18,
+      "drag_acceleration_m_s2": 2.6019598930845746e-19,
+      "altitude_m": 3.026798367500305e-09,
+      "relative_density": 5.042895877793913e-14,
+      "atmospheric_velocity_m_s": 5.934627159212227e-13
+    },
+    "records": [
+      {
+        "state": "ascending_equator",
+        "elapsed_time_s": 0.0,
+        "density_multiplier": 0.5,
+        "differences": {
+          "central_acceleration_m_s2": 0.0,
+          "j2_acceleration_m_s2": 1.734723475976807e-18,
+          "drag_acceleration_m_s2": 2.367529061553262e-22,
+          "altitude_m": 0.0,
+          "relative_density": 0.0,
+          "atmospheric_velocity_m_s": 2.8421709430404007e-13
+        },
+        "local_density_kg_m3": 2e-12,
+        "orekit_density_kg_m3": 2e-12,
+        "local_atmospheric_velocity_m_s": [
+          0.0,
+          493.7491066499997,
+          0.0
+        ],
+        "orekit_atmospheric_velocity_m_s": [
+          0.0,
+          493.74910665,
+          0.0
+        ],
+        "local_accelerations_m_s2": {
+          "central": [
+            -8.694250482823739,
+            -0.0,
+            -0.0
+          ],
+          "j2": [
+            -0.012528109018576447,
+            -0.0,
+            -0.0
+          ],
+          "drag": [
+            -0.0,
+            -6.93243127499694e-07,
+            -9.757443964794526e-07
+          ]
+        },
+        "orekit_accelerations_m_s2": {
+          "central": [
+            -8.694250482823739,
+            -0.0,
+            -0.0
+          ],
+          "j2": [
+            -0.012528109018576445,
+            0.0,
+            -0.0
+          ],
+          "drag": [
+            0.0,
+            -6.932431274996941e-07,
+            -9.757443964794528e-07
+          ]
+        }
+      },
+      {
+        "state": "ascending_equator",
+        "elapsed_time_s": 86400.0,
+        "density_multiplier": 0.5,
+        "differences": {
+          "central_acceleration_m_s2": 0.0,
+          "j2_acceleration_m_s2": 1.734723475976807e-18,
+          "drag_acceleration_m_s2": 1.8511594519647627e-20,
+          "altitude_m": 9.313225746154785e-10,
+          "relative_density": 1.5550026163716585e-14,
+          "atmospheric_velocity_m_s": 3.979039320256561e-13
+        },
+        "local_density_kg_m3": 2e-12,
+        "orekit_density_kg_m3": 1.999999999999969e-12,
+        "local_atmospheric_velocity_m_s": [
+          0.0,
+          493.7491066499997,
+          0.0
+        ],
+        "orekit_atmospheric_velocity_m_s": [
+          0.0,
+          493.7491066500001,
+          0.0
+        ],
+        "local_accelerations_m_s2": {
+          "central": [
+            -8.694250482823739,
+            -0.0,
+            -0.0
+          ],
+          "j2": [
+            -0.012528109018576447,
+            -0.0,
+            -0.0
+          ],
+          "drag": [
+            -0.0,
+            -6.93243127499694e-07,
+            -9.757443964794526e-07
+          ]
+        },
+        "orekit_accelerations_m_s2": {
+          "central": [
+            -8.694250482823739,
+            -0.0,
+            -0.0
+          ],
+          "j2": [
+            -0.012528109018576445,
+            0.0,
+            -0.0
+          ],
+          "drag": [
+            0.0,
+            -6.932431274996832e-07,
+            -9.757443964794375e-07
+          ]
+        }
+      },
+      {
+        "state": "ascending_equator",
+        "elapsed_time_s": 604800.0,
+        "density_multiplier": 0.5,
+        "differences": {
+          "central_acceleration_m_s2": 0.0,
+          "j2_acceleration_m_s2": 1.734723475976807e-18,
+          "drag_acceleration_m_s2": 1.86229902707436e-20,
+          "altitude_m": 9.313225746154785e-10,
+          "relative_density": 1.5550026163716585e-14,
+          "atmospheric_velocity_m_s": 8.489139145240188e-15
+        },
+        "local_density_kg_m3": 2e-12,
+        "orekit_density_kg_m3": 2.000000000000031e-12,
+        "local_atmospheric_velocity_m_s": [
+          0.0,
+          493.7491066499997,
+          0.0
+        ],
+        "orekit_atmospheric_velocity_m_s": [
+          8.489139145240188e-15,
+          493.7491066499997,
+          0.0
+        ],
+        "local_accelerations_m_s2": {
+          "central": [
+            -8.694250482823739,
+            -0.0,
+            -0.0
+          ],
+          "j2": [
+            -0.012528109018576447,
+            -0.0,
+            -0.0
+          ],
+          "drag": [
+            -0.0,
+            -6.93243127499694e-07,
+            -9.757443964794526e-07
+          ]
+        },
+        "orekit_accelerations_m_s2": {
+          "central": [
+            -8.694250482823739,
+            -0.0,
+            -0.0
+          ],
+          "j2": [
+            -0.012528109018576445,
+            0.0,
+            -0.0
+          ],
+          "drag": [
+            1.3775615613953305e-24,
+            -6.932431274997047e-07,
+            -9.757443964794678e-07
+          ]
+        }
+      },
+      {
+        "state": "opposite_equator",
+        "elapsed_time_s": 0.0,
+        "density_multiplier": 0.5,
+        "differences": {
+          "central_acceleration_m_s2": 0.0,
+          "j2_acceleration_m_s2": 1.734723475976807e-18,
+          "drag_acceleration_m_s2": 2.367529061553262e-22,
+          "altitude_m": 0.0,
+          "relative_density": 0.0,
+          "atmospheric_velocity_m_s": 2.8421709430404007e-13
+        },
+        "local_density_kg_m3": 2e-12,
+        "orekit_density_kg_m3": 2e-12,
+        "local_atmospheric_velocity_m_s": [
+          0.0,
+          -493.7491066499997,
+          0.0
+        ],
+        "orekit_atmospheric_velocity_m_s": [
+          0.0,
+          -493.74910665,
+          0.0
+        ],
+        "local_accelerations_m_s2": {
+          "central": [
+            8.694250482823739,
+            0.0,
+            0.0
+          ],
+          "j2": [
+            0.012528109018576447,
+            0.0,
+            0.0
+          ],
+          "drag": [
+            0.0,
+            6.93243127499694e-07,
+            9.757443964794526e-07
+          ]
+        },
+        "orekit_accelerations_m_s2": {
+          "central": [
+            8.694250482823739,
+            0.0,
+            0.0
+          ],
+          "j2": [
+            0.012528109018576445,
+            0.0,
+            0.0
+          ],
+          "drag": [
+            0.0,
+            6.932431274996941e-07,
+            9.757443964794528e-07
+          ]
+        }
+      },
+      {
+        "state": "opposite_equator",
+        "elapsed_time_s": 86400.0,
+        "density_multiplier": 0.5,
+        "differences": {
+          "central_acceleration_m_s2": 0.0,
+          "j2_acceleration_m_s2": 1.734723475976807e-18,
+          "drag_acceleration_m_s2": 1.8511594519647627e-20,
+          "altitude_m": 9.313225746154785e-10,
+          "relative_density": 1.5550026163716585e-14,
+          "atmospheric_velocity_m_s": 3.979039320256561e-13
+        },
+        "local_density_kg_m3": 2e-12,
+        "orekit_density_kg_m3": 1.999999999999969e-12,
+        "local_atmospheric_velocity_m_s": [
+          0.0,
+          -493.7491066499997,
+          0.0
+        ],
+        "orekit_atmospheric_velocity_m_s": [
+          0.0,
+          -493.7491066500001,
+          0.0
+        ],
+        "local_accelerations_m_s2": {
+          "central": [
+            8.694250482823739,
+            0.0,
+            0.0
+          ],
+          "j2": [
+            0.012528109018576447,
+            0.0,
+            0.0
+          ],
+          "drag": [
+            0.0,
+            6.93243127499694e-07,
+            9.757443964794526e-07
+          ]
+        },
+        "orekit_accelerations_m_s2": {
+          "central": [
+            8.694250482823739,
+            0.0,
+            0.0
+          ],
+          "j2": [
+            0.012528109018576445,
+            0.0,
+            0.0
+          ],
+          "drag": [
+            0.0,
+            6.932431274996832e-07,
+            9.757443964794375e-07
+          ]
+        }
+      },
+      {
+        "state": "opposite_equator",
+        "elapsed_time_s": 604800.0,
+        "density_multiplier": 0.5,
+        "differences": {
+          "central_acceleration_m_s2": 0.0,
+          "j2_acceleration_m_s2": 1.734723475976807e-18,
+          "drag_acceleration_m_s2": 1.86229902707436e-20,
+          "altitude_m": 9.313225746154785e-10,
+          "relative_density": 1.5550026163716585e-14,
+          "atmospheric_velocity_m_s": 8.489139145240188e-15
+        },
+        "local_density_kg_m3": 2e-12,
+        "orekit_density_kg_m3": 2.000000000000031e-12,
+        "local_atmospheric_velocity_m_s": [
+          0.0,
+          -493.7491066499997,
+          0.0
+        ],
+        "orekit_atmospheric_velocity_m_s": [
+          -8.489139145240188e-15,
+          -493.7491066499997,
+          0.0
+        ],
+        "local_accelerations_m_s2": {
+          "central": [
+            8.694250482823739,
+            0.0,
+            0.0
+          ],
+          "j2": [
+            0.012528109018576447,
+            0.0,
+            0.0
+          ],
+          "drag": [
+            0.0,
+            6.93243127499694e-07,
+            9.757443964794526e-07
+          ]
+        },
+        "orekit_accelerations_m_s2": {
+          "central": [
+            8.694250482823739,
+            0.0,
+            0.0
+          ],
+          "j2": [
+            0.012528109018576445,
+            0.0,
+            0.0
+          ],
+          "drag": [
+            -1.3775615613953305e-24,
+            6.932431274997047e-07,
+            9.757443964794678e-07
+          ]
+        }
+      },
+      {
+        "state": "north_oblique",
+        "elapsed_time_s": 0.0,
+        "density_multiplier": 0.5,
+        "differences": {
+          "central_acceleration_m_s2": 1.3322676295501878e-15,
+          "j2_acceleration_m_s2": 4.470280076681873e-18,
+          "drag_acceleration_m_s2": 1.473280444891796e-20,
+          "altitude_m": 6.984919309616089e-10,
+          "relative_density": 1.1453356739396346e-14,
+          "atmospheric_velocity_m_s": 3.4224270219716276e-13
+        },
+        "local_density_kg_m3": 2.362720825731292e-12,
+        "orekit_density_kg_m3": 2.3627208257312647e-12,
+        "local_atmospheric_velocity_m_s": [
+          -199.97680770977968,
+          249.97100963722414,
+          0.0
+        ],
+        "orekit_atmospheric_velocity_m_s": [
+          -199.97680770977934,
+          249.97100963722417,
+          0.0
+        ],
+        "local_accelerations_m_s2": {
+          "central": [
+            -4.421209588136347,
+            -3.536967670509078,
+            -6.63181438220452
+          ],
+          "j2": [
+            0.012089447335844826,
+            0.009671557868675861,
+            -0.0010348304105410693
+          ],
+          "drag": [
+            8.786218771742982e-07,
+            -5.94902661505886e-07,
+            -7.321813599447081e-07
+          ]
+        },
+        "orekit_accelerations_m_s2": {
+          "central": [
+            -4.421209588136348,
+            -3.5369676705090782,
+            -6.631814382204521
+          ],
+          "j2": [
+            0.012089447335844824,
+            0.009671557868675861,
+            -0.0010348304105410652
+          ],
+          "drag": [
+            8.786218771742881e-07,
+            -5.949026615058792e-07,
+            -7.321813599446998e-07
+          ]
+        }
+      },
+      {
+        "state": "north_oblique",
+        "elapsed_time_s": 86400.0,
+        "density_multiplier": 0.5,
+        "differences": {
+          "central_acceleration_m_s2": 1.3322676295501878e-15,
+          "j2_acceleration_m_s2": 4.470280076681873e-18,
+          "drag_acceleration_m_s2": 1.473280444891796e-20,
+          "altitude_m": 6.984919309616089e-10,
+          "relative_density": 1.1453356739396346e-14,
+          "atmospheric_velocity_m_s": 2.8563464471519893e-13
+        },
+        "local_density_kg_m3": 2.362720825731292e-12,
+        "orekit_density_kg_m3": 2.3627208257312647e-12,
+        "local_atmospheric_velocity_m_s": [
+          -199.97680770977968,
+          249.97100963722414,
+          0.0
+        ],
+        "orekit_atmospheric_velocity_m_s": [
+          -199.9768077097794,
+          249.97100963722417,
+          0.0
+        ],
+        "local_accelerations_m_s2": {
+          "central": [
+            -4.421209588136347,
+            -3.536967670509078,
+            -6.63181438220452
+          ],
+          "j2": [
+            0.012089447335844826,
+            0.009671557868675861,
+            -0.0010348304105410693
+          ],
+          "drag": [
+            8.786218771742982e-07,
+            -5.94902661505886e-07,
+            -7.321813599447081e-07
+          ]
+        },
+        "orekit_accelerations_m_s2": {
+          "central": [
+            -4.421209588136348,
+            -3.5369676705090782,
+            -6.631814382204521
+          ],
+          "j2": [
+            0.012089447335844824,
+            0.009671557868675861,
+            -0.0010348304105410652
+          ],
+          "drag": [
+            8.786218771742881e-07,
+            -5.949026615058792e-07,
+            -7.321813599446998e-07
+          ]
+        }
+      },
+      {
+        "state": "north_oblique",
+        "elapsed_time_s": 604800.0,
+        "density_multiplier": 0.5,
+        "differences": {
+          "central_acceleration_m_s2": 1.3322676295501878e-15,
+          "j2_acceleration_m_s2": 4.470280076681873e-18,
+          "drag_acceleration_m_s2": 6.504899732711436e-20,
+          "altitude_m": 3.026798367500305e-09,
+          "relative_density": 5.042895877793913e-14,
+          "atmospheric_velocity_m_s": 3.8131724593878115e-13
+        },
+        "local_density_kg_m3": 2.362720825731292e-12,
+        "orekit_density_kg_m3": 2.362720825731411e-12,
+        "local_atmospheric_velocity_m_s": [
+          -199.97680770977968,
+          249.97100963722414,
+          0.0
+        ],
+        "orekit_atmospheric_velocity_m_s": [
+          -199.97680770977934,
+          249.97100963722397,
+          0.0
+        ],
+        "local_accelerations_m_s2": {
+          "central": [
+            -4.421209588136347,
+            -3.536967670509078,
+            -6.63181438220452
+          ],
+          "j2": [
+            0.012089447335844826,
+            0.009671557868675861,
+            -0.0010348304105410693
+          ],
+          "drag": [
+            8.786218771742982e-07,
+            -5.94902661505886e-07,
+            -7.321813599447081e-07
+          ]
+        },
+        "orekit_accelerations_m_s2": {
+          "central": [
+            -4.421209588136348,
+            -3.5369676705090782,
+            -6.631814382204521
+          ],
+          "j2": [
+            0.012089447335844824,
+            0.009671557868675861,
+            -0.0010348304105410652
+          ],
+          "drag": [
+            8.786218771743426e-07,
+            -5.94902661505916e-07,
+            -7.321813599447451e-07
+          ]
+        }
+      },
+      {
+        "state": "south_oblique",
+        "elapsed_time_s": 0.0,
+        "density_multiplier": 0.5,
+        "differences": {
+          "central_acceleration_m_s2": 2.0350724194510405e-15,
+          "j2_acceleration_m_s2": 9.055522398700297e-18,
+          "drag_acceleration_m_s2": 6.922745660495462e-21,
+          "altitude_m": 6.984919309616089e-10,
+          "relative_density": 1.1653481316392475e-14,
+          "atmospheric_velocity_m_s": 4.687428401686771e-13
+        },
+        "local_density_kg_m3": 1.213061319425248e-12,
+        "orekit_density_kg_m3": 1.2130613194252621e-12,
+        "local_atmospheric_velocity_m_s": [
+          348.0268763072436,
+          223.73156334037049,
+          0.0
+        ],
+        "orekit_atmospheric_velocity_m_s": [
+          348.0268763072431,
+          223.7315633403706,
+          0.0
+        ],
+        "local_accelerations_m_s2": {
+          "central": [
+            -3.887704071734433,
+            6.04753966714245,
+            4.751638309897641
+          ],
+          "j2": [
+            0.002887978305681396,
+            -0.004492410697726616,
+            0.010043591756580667
+          ],
+          "drag": [
+            -4.1801724399943973e-07,
+            -2.4947007423247087e-07,
+            3.594322089871541e-07
+          ]
+        },
+        "orekit_accelerations_m_s2": {
+          "central": [
+            -3.8877040717344333,
+            6.047539667142452,
+            4.751638309897642
+          ],
+          "j2": [
+            0.0028879783056813984,
+            -0.004492410697726621,
+            0.01004359175658066
+          ],
+          "drag": [
+            -4.180172439994445e-07,
+            -2.494700742324737e-07,
+            3.5943220898715824e-07
+          ]
+        }
+      },
+      {
+        "state": "south_oblique",
+        "elapsed_time_s": 86400.0,
+        "density_multiplier": 0.5,
+        "differences": {
+          "central_acceleration_m_s2": 2.0350724194510405e-15,
+          "j2_acceleration_m_s2": 9.055522398700297e-18,
+          "drag_acceleration_m_s2": 1.7100870712243712e-20,
+          "altitude_m": 1.6880221664905548e-09,
+          "relative_density": 2.813483346386183e-14,
+          "atmospheric_velocity_m_s": 5.934627159212227e-13
+        },
+        "local_density_kg_m3": 1.213061319425248e-12,
+        "orekit_density_kg_m3": 1.2130613194252821e-12,
+        "local_atmospheric_velocity_m_s": [
+          348.0268763072436,
+          223.73156334037049,
+          0.0
+        ],
+        "orekit_atmospheric_velocity_m_s": [
+          348.026876307243,
+          223.73156334037066,
+          0.0
+        ],
+        "local_accelerations_m_s2": {
+          "central": [
+            -3.887704071734433,
+            6.04753966714245,
+            4.751638309897641
+          ],
+          "j2": [
+            0.002887978305681396,
+            -0.004492410697726616,
+            0.010043591756580667
+          ],
+          "drag": [
+            -4.1801724399943973e-07,
+            -2.4947007423247087e-07,
+            3.594322089871541e-07
+          ]
+        },
+        "orekit_accelerations_m_s2": {
+          "central": [
+            -3.8877040717344333,
+            6.047539667142452,
+            4.751638309897642
+          ],
+          "j2": [
+            0.0028879783056813984,
+            -0.004492410697726621,
+            0.01004359175658066
+          ],
+          "drag": [
+            -4.180172439994516e-07,
+            -2.494700742324779e-07,
+            3.594322089871642e-07
+          ]
+        }
+      },
+      {
+        "state": "south_oblique",
+        "elapsed_time_s": 604800.0,
+        "density_multiplier": 0.5,
+        "differences": {
+          "central_acceleration_m_s2": 2.0350724194510405e-15,
+          "j2_acceleration_m_s2": 9.055522398700297e-18,
+          "drag_acceleration_m_s2": 1.7027620581176904e-20,
+          "altitude_m": 1.6880221664905548e-09,
+          "relative_density": 2.813483346386183e-14,
+          "atmospheric_velocity_m_s": 4.556346636343676e-13
+        },
+        "local_density_kg_m3": 1.213061319425248e-12,
+        "orekit_density_kg_m3": 1.2130613194252821e-12,
+        "local_atmospheric_velocity_m_s": [
+          348.0268763072436,
+          223.73156334037049,
+          0.0
+        ],
+        "orekit_atmospheric_velocity_m_s": [
+          348.0268763072431,
+          223.73156334037046,
+          0.0
+        ],
+        "local_accelerations_m_s2": {
+          "central": [
+            -3.887704071734433,
+            6.04753966714245,
+            4.751638309897641
+          ],
+          "j2": [
+            0.002887978305681396,
+            -0.004492410697726616,
+            0.010043591756580667
+          ],
+          "drag": [
+            -4.1801724399943973e-07,
+            -2.4947007423247087e-07,
+            3.594322089871541e-07
+          ]
+        },
+        "orekit_accelerations_m_s2": {
+          "central": [
+            -3.8877040717344333,
+            6.047539667142452,
+            4.751638309897642
+          ],
+          "j2": [
+            0.0028879783056813984,
+            -0.004492410697726621,
+            0.01004359175658066
+          ],
+          "drag": [
+            -4.180172439994515e-07,
+            -2.494700742324779e-07,
+            3.594322089871642e-07
+          ]
+        }
+      },
+      {
+        "state": "near_pole",
+        "elapsed_time_s": 0.0,
+        "density_multiplier": 0.5,
+        "differences": {
+          "central_acceleration_m_s2": 1.7763568526351403e-15,
+          "j2_acceleration_m_s2": 8.470329472543003e-22,
+          "drag_acceleration_m_s2": 1.0683958550414305e-20,
+          "altitude_m": 5.238689482212067e-10,
+          "relative_density": 8.683780844672764e-15,
+          "atmospheric_velocity_m_s": 4.353462035311395e-14
+        },
+        "local_density_kg_m3": 2.000000000000031e-12,
+        "orekit_density_kg_m3": 2.0000000000000484e-12,
+        "local_atmospheric_velocity_m_s": [
+          0.0,
+          0.07292114999995647,
+          0.0
+        ],
+        "orekit_atmospheric_velocity_m_s": [
+          0.0,
+          0.07292115,
+          0.0
+        ],
+        "local_accelerations_m_s2": {
+          "central": [
+            -0.0012840423102678691,
+            -0.0,
+            -8.69425038800449
+          ],
+          "j2": [
+            7.401038946683469e-06,
+            0.0,
+            0.025056216397578462
+          ],
+          "drag": [
+            -1.2156686444751283e-06,
+            -1.6426756709723707e-07,
+            -0.0
+          ]
+        },
+        "orekit_accelerations_m_s2": {
+          "central": [
+            -0.001284042310267869,
+            -0.0,
+            -8.694250388004487
+          ],
+          "j2": [
+            7.40103894668347e-06,
+            0.0,
+            0.025056216397578462
+          ],
+          "drag": [
+            -1.215668644475139e-06,
+            -1.642675670972385e-07,
+            0.0
+          ]
+        }
+      },
+      {
+        "state": "near_pole",
+        "elapsed_time_s": 86400.0,
+        "density_multiplier": 0.5,
+        "differences": {
+          "central_acceleration_m_s2": 1.7763568526351403e-15,
+          "j2_acceleration_m_s2": 8.470329472543003e-22,
+          "drag_acceleration_m_s2": 1.0683958550414305e-20,
+          "altitude_m": 5.238689482212067e-10,
+          "relative_density": 8.683780844672764e-15,
+          "atmospheric_velocity_m_s": 4.3548498141692356e-14
+        },
+        "local_density_kg_m3": 2.000000000000031e-12,
+        "orekit_density_kg_m3": 2.0000000000000484e-12,
+        "local_atmospheric_velocity_m_s": [
+          0.0,
+          0.07292114999995647,
+          0.0
+        ],
+        "orekit_atmospheric_velocity_m_s": [
+          -2.5906796707886314e-19,
+          0.07292115000000002,
+          0.0
+        ],
+        "local_accelerations_m_s2": {
+          "central": [
+            -0.0012840423102678691,
+            -0.0,
+            -8.69425038800449
+          ],
+          "j2": [
+            7.401038946683469e-06,
+            0.0,
+            0.025056216397578462
+          ],
+          "drag": [
+            -1.2156686444751283e-06,
+            -1.6426756709723707e-07,
+            -0.0
+          ]
+        },
+        "orekit_accelerations_m_s2": {
+          "central": [
+            -0.001284042310267869,
+            -0.0,
+            -8.694250388004487
+          ],
+          "j2": [
+            7.40103894668347e-06,
+            0.0,
+            0.025056216397578462
+          ],
+          "drag": [
+            -1.215668644475139e-06,
+            -1.642675670972385e-07,
+            0.0
+          ]
+        }
+      },
+      {
+        "state": "near_pole",
+        "elapsed_time_s": 604800.0,
+        "density_multiplier": 0.5,
+        "differences": {
+          "central_acceleration_m_s2": 1.7763568526351403e-15,
+          "j2_acceleration_m_s2": 8.470329472543003e-22,
+          "drag_acceleration_m_s2": 2.2434898891220286e-20,
+          "altitude_m": 1.1059455573558807e-09,
+          "relative_density": 1.8377303648028407e-14,
+          "atmospheric_velocity_m_s": 4.349298700203571e-14
+        },
+        "local_density_kg_m3": 2.000000000000031e-12,
+        "orekit_density_kg_m3": 2.000000000000068e-12,
+        "local_atmospheric_velocity_m_s": [
+          0.0,
+          0.07292114999995647,
+          0.0
+        ],
+        "orekit_atmospheric_velocity_m_s": [
+          1.0362718683154526e-18,
+          0.07292114999999996,
+          0.0
+        ],
+        "local_accelerations_m_s2": {
+          "central": [
+            -0.0012840423102678691,
+            -0.0,
+            -8.69425038800449
+          ],
+          "j2": [
+            7.401038946683469e-06,
+            0.0,
+            0.025056216397578462
+          ],
+          "drag": [
+            -1.2156686444751283e-06,
+            -1.6426756709723707e-07,
+            -0.0
+          ]
+        },
+        "orekit_accelerations_m_s2": {
+          "central": [
+            -0.001284042310267869,
+            -0.0,
+            -8.694250388004487
+          ],
+          "j2": [
+            7.40103894668347e-06,
+            0.0,
+            0.025056216397578462
+          ],
+          "drag": [
+            -1.2156686444751506e-06,
+            -1.6426756709724006e-07,
+            0.0
+          ]
+        }
+      },
+      {
+        "state": "ascending_equator",
+        "elapsed_time_s": 0.0,
+        "density_multiplier": 1.0,
+        "differences": {
+          "central_acceleration_m_s2": 0.0,
+          "j2_acceleration_m_s2": 1.734723475976807e-18,
+          "drag_acceleration_m_s2": 4.735058123106524e-22,
+          "altitude_m": 0.0,
+          "relative_density": 0.0,
+          "atmospheric_velocity_m_s": 2.8421709430404007e-13
+        },
+        "local_density_kg_m3": 4e-12,
+        "orekit_density_kg_m3": 4e-12,
+        "local_atmospheric_velocity_m_s": [
+          0.0,
+          493.7491066499997,
+          0.0
+        ],
+        "orekit_atmospheric_velocity_m_s": [
+          0.0,
+          493.74910665,
+          0.0
+        ],
+        "local_accelerations_m_s2": {
+          "central": [
+            -8.694250482823739,
+            -0.0,
+            -0.0
+          ],
+          "j2": [
+            -0.012528109018576447,
+            -0.0,
+            -0.0
+          ],
+          "drag": [
+            -0.0,
+            -1.386486254999388e-06,
+            -1.951488792958905e-06
+          ]
+        },
+        "orekit_accelerations_m_s2": {
+          "central": [
+            -8.694250482823739,
+            -0.0,
+            -0.0
+          ],
+          "j2": [
+            -0.012528109018576445,
+            0.0,
+            -0.0
+          ],
+          "drag": [
+            0.0,
+            -1.3864862549993882e-06,
+            -1.9514887929589055e-06
+          ]
+        }
+      },
+      {
+        "state": "ascending_equator",
+        "elapsed_time_s": 86400.0,
+        "density_multiplier": 1.0,
+        "differences": {
+          "central_acceleration_m_s2": 0.0,
+          "j2_acceleration_m_s2": 1.734723475976807e-18,
+          "drag_acceleration_m_s2": 3.7023189039295254e-20,
+          "altitude_m": 9.313225746154785e-10,
+          "relative_density": 1.5550026163716585e-14,
+          "atmospheric_velocity_m_s": 3.979039320256561e-13
+        },
+        "local_density_kg_m3": 4e-12,
+        "orekit_density_kg_m3": 3.999999999999938e-12,
+        "local_atmospheric_velocity_m_s": [
+          0.0,
+          493.7491066499997,
+          0.0
+        ],
+        "orekit_atmospheric_velocity_m_s": [
+          0.0,
+          493.7491066500001,
+          0.0
+        ],
+        "local_accelerations_m_s2": {
+          "central": [
+            -8.694250482823739,
+            -0.0,
+            -0.0
+          ],
+          "j2": [
+            -0.012528109018576447,
+            -0.0,
+            -0.0
+          ],
+          "drag": [
+            -0.0,
+            -1.386486254999388e-06,
+            -1.951488792958905e-06
+          ]
+        },
+        "orekit_accelerations_m_s2": {
+          "central": [
+            -8.694250482823739,
+            -0.0,
+            -0.0
+          ],
+          "j2": [
+            -0.012528109018576445,
+            0.0,
+            -0.0
+          ],
+          "drag": [
+            0.0,
+            -1.3864862549993664e-06,
+            -1.951488792958875e-06
+          ]
+        }
+      },
+      {
+        "state": "ascending_equator",
+        "elapsed_time_s": 604800.0,
+        "density_multiplier": 1.0,
+        "differences": {
+          "central_acceleration_m_s2": 0.0,
+          "j2_acceleration_m_s2": 1.734723475976807e-18,
+          "drag_acceleration_m_s2": 3.72459805414872e-20,
+          "altitude_m": 9.313225746154785e-10,
+          "relative_density": 1.5550026163716585e-14,
+          "atmospheric_velocity_m_s": 8.489139145240188e-15
+        },
+        "local_density_kg_m3": 4e-12,
+        "orekit_density_kg_m3": 4.000000000000062e-12,
+        "local_atmospheric_velocity_m_s": [
+          0.0,
+          493.7491066499997,
+          0.0
+        ],
+        "orekit_atmospheric_velocity_m_s": [
+          8.489139145240188e-15,
+          493.7491066499997,
+          0.0
+        ],
+        "local_accelerations_m_s2": {
+          "central": [
+            -8.694250482823739,
+            -0.0,
+            -0.0
+          ],
+          "j2": [
+            -0.012528109018576447,
+            -0.0,
+            -0.0
+          ],
+          "drag": [
+            -0.0,
+            -1.386486254999388e-06,
+            -1.951488792958905e-06
+          ]
+        },
+        "orekit_accelerations_m_s2": {
+          "central": [
+            -8.694250482823739,
+            -0.0,
+            -0.0
+          ],
+          "j2": [
+            -0.012528109018576445,
+            0.0,
+            -0.0
+          ],
+          "drag": [
+            2.755123122790661e-24,
+            -1.3864862549994094e-06,
+            -1.9514887929589356e-06
+          ]
+        }
+      },
+      {
+        "state": "opposite_equator",
+        "elapsed_time_s": 0.0,
+        "density_multiplier": 1.0,
+        "differences": {
+          "central_acceleration_m_s2": 0.0,
+          "j2_acceleration_m_s2": 1.734723475976807e-18,
+          "drag_acceleration_m_s2": 4.735058123106524e-22,
+          "altitude_m": 0.0,
+          "relative_density": 0.0,
+          "atmospheric_velocity_m_s": 2.8421709430404007e-13
+        },
+        "local_density_kg_m3": 4e-12,
+        "orekit_density_kg_m3": 4e-12,
+        "local_atmospheric_velocity_m_s": [
+          0.0,
+          -493.7491066499997,
+          0.0
+        ],
+        "orekit_atmospheric_velocity_m_s": [
+          0.0,
+          -493.74910665,
+          0.0
+        ],
+        "local_accelerations_m_s2": {
+          "central": [
+            8.694250482823739,
+            0.0,
+            0.0
+          ],
+          "j2": [
+            0.012528109018576447,
+            0.0,
+            0.0
+          ],
+          "drag": [
+            0.0,
+            1.386486254999388e-06,
+            1.951488792958905e-06
+          ]
+        },
+        "orekit_accelerations_m_s2": {
+          "central": [
+            8.694250482823739,
+            0.0,
+            0.0
+          ],
+          "j2": [
+            0.012528109018576445,
+            0.0,
+            0.0
+          ],
+          "drag": [
+            0.0,
+            1.3864862549993882e-06,
+            1.9514887929589055e-06
+          ]
+        }
+      },
+      {
+        "state": "opposite_equator",
+        "elapsed_time_s": 86400.0,
+        "density_multiplier": 1.0,
+        "differences": {
+          "central_acceleration_m_s2": 0.0,
+          "j2_acceleration_m_s2": 1.734723475976807e-18,
+          "drag_acceleration_m_s2": 3.7023189039295254e-20,
+          "altitude_m": 9.313225746154785e-10,
+          "relative_density": 1.5550026163716585e-14,
+          "atmospheric_velocity_m_s": 3.979039320256561e-13
+        },
+        "local_density_kg_m3": 4e-12,
+        "orekit_density_kg_m3": 3.999999999999938e-12,
+        "local_atmospheric_velocity_m_s": [
+          0.0,
+          -493.7491066499997,
+          0.0
+        ],
+        "orekit_atmospheric_velocity_m_s": [
+          0.0,
+          -493.7491066500001,
+          0.0
+        ],
+        "local_accelerations_m_s2": {
+          "central": [
+            8.694250482823739,
+            0.0,
+            0.0
+          ],
+          "j2": [
+            0.012528109018576447,
+            0.0,
+            0.0
+          ],
+          "drag": [
+            0.0,
+            1.386486254999388e-06,
+            1.951488792958905e-06
+          ]
+        },
+        "orekit_accelerations_m_s2": {
+          "central": [
+            8.694250482823739,
+            0.0,
+            0.0
+          ],
+          "j2": [
+            0.012528109018576445,
+            0.0,
+            0.0
+          ],
+          "drag": [
+            0.0,
+            1.3864862549993664e-06,
+            1.951488792958875e-06
+          ]
+        }
+      },
+      {
+        "state": "opposite_equator",
+        "elapsed_time_s": 604800.0,
+        "density_multiplier": 1.0,
+        "differences": {
+          "central_acceleration_m_s2": 0.0,
+          "j2_acceleration_m_s2": 1.734723475976807e-18,
+          "drag_acceleration_m_s2": 3.72459805414872e-20,
+          "altitude_m": 9.313225746154785e-10,
+          "relative_density": 1.5550026163716585e-14,
+          "atmospheric_velocity_m_s": 8.489139145240188e-15
+        },
+        "local_density_kg_m3": 4e-12,
+        "orekit_density_kg_m3": 4.000000000000062e-12,
+        "local_atmospheric_velocity_m_s": [
+          0.0,
+          -493.7491066499997,
+          0.0
+        ],
+        "orekit_atmospheric_velocity_m_s": [
+          -8.489139145240188e-15,
+          -493.7491066499997,
+          0.0
+        ],
+        "local_accelerations_m_s2": {
+          "central": [
+            8.694250482823739,
+            0.0,
+            0.0
+          ],
+          "j2": [
+            0.012528109018576447,
+            0.0,
+            0.0
+          ],
+          "drag": [
+            0.0,
+            1.386486254999388e-06,
+            1.951488792958905e-06
+          ]
+        },
+        "orekit_accelerations_m_s2": {
+          "central": [
+            8.694250482823739,
+            0.0,
+            0.0
+          ],
+          "j2": [
+            0.012528109018576445,
+            0.0,
+            0.0
+          ],
+          "drag": [
+            -2.755123122790661e-24,
+            1.3864862549994094e-06,
+            1.9514887929589356e-06
+          ]
+        }
+      },
+      {
+        "state": "north_oblique",
+        "elapsed_time_s": 0.0,
+        "density_multiplier": 1.0,
+        "differences": {
+          "central_acceleration_m_s2": 1.3322676295501878e-15,
+          "j2_acceleration_m_s2": 4.470280076681873e-18,
+          "drag_acceleration_m_s2": 2.946560889783592e-20,
+          "altitude_m": 6.984919309616089e-10,
+          "relative_density": 1.1453356739396346e-14,
+          "atmospheric_velocity_m_s": 3.4224270219716276e-13
+        },
+        "local_density_kg_m3": 4.725441651462584e-12,
+        "orekit_density_kg_m3": 4.7254416514625295e-12,
+        "local_atmospheric_velocity_m_s": [
+          -199.97680770977968,
+          249.97100963722414,
+          0.0
+        ],
+        "orekit_atmospheric_velocity_m_s": [
+          -199.97680770977934,
+          249.97100963722417,
+          0.0
+        ],
+        "local_accelerations_m_s2": {
+          "central": [
+            -4.421209588136347,
+            -3.536967670509078,
+            -6.63181438220452
+          ],
+          "j2": [
+            0.012089447335844826,
+            0.009671557868675861,
+            -0.0010348304105410693
+          ],
+          "drag": [
+            1.7572437543485964e-06,
+            -1.189805323011772e-06,
+            -1.4643627198894162e-06
+          ]
+        },
+        "orekit_accelerations_m_s2": {
+          "central": [
+            -4.421209588136348,
+            -3.5369676705090782,
+            -6.631814382204521
+          ],
+          "j2": [
+            0.012089447335844824,
+            0.009671557868675861,
+            -0.0010348304105410652
+          ],
+          "drag": [
+            1.7572437543485763e-06,
+            -1.1898053230117585e-06,
+            -1.4643627198893995e-06
+          ]
+        }
+      },
+      {
+        "state": "north_oblique",
+        "elapsed_time_s": 86400.0,
+        "density_multiplier": 1.0,
+        "differences": {
+          "central_acceleration_m_s2": 1.3322676295501878e-15,
+          "j2_acceleration_m_s2": 4.470280076681873e-18,
+          "drag_acceleration_m_s2": 2.946560889783592e-20,
+          "altitude_m": 6.984919309616089e-10,
+          "relative_density": 1.1453356739396346e-14,
+          "atmospheric_velocity_m_s": 2.8563464471519893e-13
+        },
+        "local_density_kg_m3": 4.725441651462584e-12,
+        "orekit_density_kg_m3": 4.7254416514625295e-12,
+        "local_atmospheric_velocity_m_s": [
+          -199.97680770977968,
+          249.97100963722414,
+          0.0
+        ],
+        "orekit_atmospheric_velocity_m_s": [
+          -199.9768077097794,
+          249.97100963722417,
+          0.0
+        ],
+        "local_accelerations_m_s2": {
+          "central": [
+            -4.421209588136347,
+            -3.536967670509078,
+            -6.63181438220452
+          ],
+          "j2": [
+            0.012089447335844826,
+            0.009671557868675861,
+            -0.0010348304105410693
+          ],
+          "drag": [
+            1.7572437543485964e-06,
+            -1.189805323011772e-06,
+            -1.4643627198894162e-06
+          ]
+        },
+        "orekit_accelerations_m_s2": {
+          "central": [
+            -4.421209588136348,
+            -3.5369676705090782,
+            -6.631814382204521
+          ],
+          "j2": [
+            0.012089447335844824,
+            0.009671557868675861,
+            -0.0010348304105410652
+          ],
+          "drag": [
+            1.7572437543485763e-06,
+            -1.1898053230117585e-06,
+            -1.4643627198893995e-06
+          ]
+        }
+      },
+      {
+        "state": "north_oblique",
+        "elapsed_time_s": 604800.0,
+        "density_multiplier": 1.0,
+        "differences": {
+          "central_acceleration_m_s2": 1.3322676295501878e-15,
+          "j2_acceleration_m_s2": 4.470280076681873e-18,
+          "drag_acceleration_m_s2": 1.3009799465422873e-19,
+          "altitude_m": 3.026798367500305e-09,
+          "relative_density": 5.042895877793913e-14,
+          "atmospheric_velocity_m_s": 3.8131724593878115e-13
+        },
+        "local_density_kg_m3": 4.725441651462584e-12,
+        "orekit_density_kg_m3": 4.725441651462822e-12,
+        "local_atmospheric_velocity_m_s": [
+          -199.97680770977968,
+          249.97100963722414,
+          0.0
+        ],
+        "orekit_atmospheric_velocity_m_s": [
+          -199.97680770977934,
+          249.97100963722397,
+          0.0
+        ],
+        "local_accelerations_m_s2": {
+          "central": [
+            -4.421209588136347,
+            -3.536967670509078,
+            -6.63181438220452
+          ],
+          "j2": [
+            0.012089447335844826,
+            0.009671557868675861,
+            -0.0010348304105410693
+          ],
+          "drag": [
+            1.7572437543485964e-06,
+            -1.189805323011772e-06,
+            -1.4643627198894162e-06
+          ]
+        },
+        "orekit_accelerations_m_s2": {
+          "central": [
+            -4.421209588136348,
+            -3.5369676705090782,
+            -6.631814382204521
+          ],
+          "j2": [
+            0.012089447335844824,
+            0.009671557868675861,
+            -0.0010348304105410652
+          ],
+          "drag": [
+            1.7572437543486851e-06,
+            -1.189805323011832e-06,
+            -1.4643627198894901e-06
+          ]
+        }
+      },
+      {
+        "state": "south_oblique",
+        "elapsed_time_s": 0.0,
+        "density_multiplier": 1.0,
+        "differences": {
+          "central_acceleration_m_s2": 2.0350724194510405e-15,
+          "j2_acceleration_m_s2": 9.055522398700297e-18,
+          "drag_acceleration_m_s2": 1.3845491320990923e-20,
+          "altitude_m": 6.984919309616089e-10,
+          "relative_density": 1.1653481316392475e-14,
+          "atmospheric_velocity_m_s": 4.687428401686771e-13
+        },
+        "local_density_kg_m3": 2.426122638850496e-12,
+        "orekit_density_kg_m3": 2.4261226388505243e-12,
+        "local_atmospheric_velocity_m_s": [
+          348.0268763072436,
+          223.73156334037049,
+          0.0
+        ],
+        "orekit_atmospheric_velocity_m_s": [
+          348.0268763072431,
+          223.7315633403706,
+          0.0
+        ],
+        "local_accelerations_m_s2": {
+          "central": [
+            -3.887704071734433,
+            6.04753966714245,
+            4.751638309897641
+          ],
+          "j2": [
+            0.002887978305681396,
+            -0.004492410697726616,
+            0.010043591756580667
+          ],
+          "drag": [
+            -8.360344879988795e-07,
+            -4.989401484649417e-07,
+            7.188644179743082e-07
+          ]
+        },
+        "orekit_accelerations_m_s2": {
+          "central": [
+            -3.8877040717344333,
+            6.047539667142452,
+            4.751638309897642
+          ],
+          "j2": [
+            0.0028879783056813984,
+            -0.004492410697726621,
+            0.01004359175658066
+          ],
+          "drag": [
+            -8.36034487998889e-07,
+            -4.989401484649474e-07,
+            7.188644179743165e-07
+          ]
+        }
+      },
+      {
+        "state": "south_oblique",
+        "elapsed_time_s": 86400.0,
+        "density_multiplier": 1.0,
+        "differences": {
+          "central_acceleration_m_s2": 2.0350724194510405e-15,
+          "j2_acceleration_m_s2": 9.055522398700297e-18,
+          "drag_acceleration_m_s2": 3.4201741424487424e-20,
+          "altitude_m": 1.6880221664905548e-09,
+          "relative_density": 2.813483346386183e-14,
+          "atmospheric_velocity_m_s": 5.934627159212227e-13
+        },
+        "local_density_kg_m3": 2.426122638850496e-12,
+        "orekit_density_kg_m3": 2.4261226388505643e-12,
+        "local_atmospheric_velocity_m_s": [
+          348.0268763072436,
+          223.73156334037049,
+          0.0
+        ],
+        "orekit_atmospheric_velocity_m_s": [
+          348.026876307243,
+          223.73156334037066,
+          0.0
+        ],
+        "local_accelerations_m_s2": {
+          "central": [
+            -3.887704071734433,
+            6.04753966714245,
+            4.751638309897641
+          ],
+          "j2": [
+            0.002887978305681396,
+            -0.004492410697726616,
+            0.010043591756580667
+          ],
+          "drag": [
+            -8.360344879988795e-07,
+            -4.989401484649417e-07,
+            7.188644179743082e-07
+          ]
+        },
+        "orekit_accelerations_m_s2": {
+          "central": [
+            -3.8877040717344333,
+            6.047539667142452,
+            4.751638309897642
+          ],
+          "j2": [
+            0.0028879783056813984,
+            -0.004492410697726621,
+            0.01004359175658066
+          ],
+          "drag": [
+            -8.360344879989032e-07,
+            -4.989401484649558e-07,
+            7.188644179743284e-07
+          ]
+        }
+      },
+      {
+        "state": "south_oblique",
+        "elapsed_time_s": 604800.0,
+        "density_multiplier": 1.0,
+        "differences": {
+          "central_acceleration_m_s2": 2.0350724194510405e-15,
+          "j2_acceleration_m_s2": 9.055522398700297e-18,
+          "drag_acceleration_m_s2": 3.405524116235381e-20,
+          "altitude_m": 1.6880221664905548e-09,
+          "relative_density": 2.813483346386183e-14,
+          "atmospheric_velocity_m_s": 4.556346636343676e-13
+        },
+        "local_density_kg_m3": 2.426122638850496e-12,
+        "orekit_density_kg_m3": 2.4261226388505643e-12,
+        "local_atmospheric_velocity_m_s": [
+          348.0268763072436,
+          223.73156334037049,
+          0.0
+        ],
+        "orekit_atmospheric_velocity_m_s": [
+          348.0268763072431,
+          223.73156334037046,
+          0.0
+        ],
+        "local_accelerations_m_s2": {
+          "central": [
+            -3.887704071734433,
+            6.04753966714245,
+            4.751638309897641
+          ],
+          "j2": [
+            0.002887978305681396,
+            -0.004492410697726616,
+            0.010043591756580667
+          ],
+          "drag": [
+            -8.360344879988795e-07,
+            -4.989401484649417e-07,
+            7.188644179743082e-07
+          ]
+        },
+        "orekit_accelerations_m_s2": {
+          "central": [
+            -3.8877040717344333,
+            6.047539667142452,
+            4.751638309897642
+          ],
+          "j2": [
+            0.0028879783056813984,
+            -0.004492410697726621,
+            0.01004359175658066
+          ],
+          "drag": [
+            -8.36034487998903e-07,
+            -4.989401484649558e-07,
+            7.188644179743284e-07
+          ]
+        }
+      },
+      {
+        "state": "near_pole",
+        "elapsed_time_s": 0.0,
+        "density_multiplier": 1.0,
+        "differences": {
+          "central_acceleration_m_s2": 1.7763568526351403e-15,
+          "j2_acceleration_m_s2": 8.470329472543003e-22,
+          "drag_acceleration_m_s2": 2.136791710082861e-20,
+          "altitude_m": 5.238689482212067e-10,
+          "relative_density": 8.683780844672764e-15,
+          "atmospheric_velocity_m_s": 4.353462035311395e-14
+        },
+        "local_density_kg_m3": 4.000000000000062e-12,
+        "orekit_density_kg_m3": 4.000000000000097e-12,
+        "local_atmospheric_velocity_m_s": [
+          0.0,
+          0.07292114999995647,
+          0.0
+        ],
+        "orekit_atmospheric_velocity_m_s": [
+          0.0,
+          0.07292115,
+          0.0
+        ],
+        "local_accelerations_m_s2": {
+          "central": [
+            -0.0012840423102678691,
+            -0.0,
+            -8.69425038800449
+          ],
+          "j2": [
+            7.401038946683469e-06,
+            0.0,
+            0.025056216397578462
+          ],
+          "drag": [
+            -2.4313372889502567e-06,
+            -3.2853513419447414e-07,
+            -0.0
+          ]
+        },
+        "orekit_accelerations_m_s2": {
+          "central": [
+            -0.001284042310267869,
+            -0.0,
+            -8.694250388004487
+          ],
+          "j2": [
+            7.40103894668347e-06,
+            0.0,
+            0.025056216397578462
+          ],
+          "drag": [
+            -2.431337288950278e-06,
+            -3.28535134194477e-07,
+            0.0
+          ]
+        }
+      },
+      {
+        "state": "near_pole",
+        "elapsed_time_s": 86400.0,
+        "density_multiplier": 1.0,
+        "differences": {
+          "central_acceleration_m_s2": 1.7763568526351403e-15,
+          "j2_acceleration_m_s2": 8.470329472543003e-22,
+          "drag_acceleration_m_s2": 2.136791710082861e-20,
+          "altitude_m": 5.238689482212067e-10,
+          "relative_density": 8.683780844672764e-15,
+          "atmospheric_velocity_m_s": 4.3548498141692356e-14
+        },
+        "local_density_kg_m3": 4.000000000000062e-12,
+        "orekit_density_kg_m3": 4.000000000000097e-12,
+        "local_atmospheric_velocity_m_s": [
+          0.0,
+          0.07292114999995647,
+          0.0
+        ],
+        "orekit_atmospheric_velocity_m_s": [
+          -2.5906796707886314e-19,
+          0.07292115000000002,
+          0.0
+        ],
+        "local_accelerations_m_s2": {
+          "central": [
+            -0.0012840423102678691,
+            -0.0,
+            -8.69425038800449
+          ],
+          "j2": [
+            7.401038946683469e-06,
+            0.0,
+            0.025056216397578462
+          ],
+          "drag": [
+            -2.4313372889502567e-06,
+            -3.2853513419447414e-07,
+            -0.0
+          ]
+        },
+        "orekit_accelerations_m_s2": {
+          "central": [
+            -0.001284042310267869,
+            -0.0,
+            -8.694250388004487
+          ],
+          "j2": [
+            7.40103894668347e-06,
+            0.0,
+            0.025056216397578462
+          ],
+          "drag": [
+            -2.431337288950278e-06,
+            -3.28535134194477e-07,
+            0.0
+          ]
+        }
+      },
+      {
+        "state": "near_pole",
+        "elapsed_time_s": 604800.0,
+        "density_multiplier": 1.0,
+        "differences": {
+          "central_acceleration_m_s2": 1.7763568526351403e-15,
+          "j2_acceleration_m_s2": 8.470329472543003e-22,
+          "drag_acceleration_m_s2": 4.486979778244057e-20,
+          "altitude_m": 1.1059455573558807e-09,
+          "relative_density": 1.8377303648028407e-14,
+          "atmospheric_velocity_m_s": 4.349298700203571e-14
+        },
+        "local_density_kg_m3": 4.000000000000062e-12,
+        "orekit_density_kg_m3": 4.000000000000136e-12,
+        "local_atmospheric_velocity_m_s": [
+          0.0,
+          0.07292114999995647,
+          0.0
+        ],
+        "orekit_atmospheric_velocity_m_s": [
+          1.0362718683154526e-18,
+          0.07292114999999996,
+          0.0
+        ],
+        "local_accelerations_m_s2": {
+          "central": [
+            -0.0012840423102678691,
+            -0.0,
+            -8.69425038800449
+          ],
+          "j2": [
+            7.401038946683469e-06,
+            0.0,
+            0.025056216397578462
+          ],
+          "drag": [
+            -2.4313372889502567e-06,
+            -3.2853513419447414e-07,
+            -0.0
+          ]
+        },
+        "orekit_accelerations_m_s2": {
+          "central": [
+            -0.001284042310267869,
+            -0.0,
+            -8.694250388004487
+          ],
+          "j2": [
+            7.40103894668347e-06,
+            0.0,
+            0.025056216397578462
+          ],
+          "drag": [
+            -2.431337288950301e-06,
+            -3.285351341944801e-07,
+            0.0
+          ]
+        }
+      },
+      {
+        "state": "ascending_equator",
+        "elapsed_time_s": 0.0,
+        "density_multiplier": 2.0,
+        "differences": {
+          "central_acceleration_m_s2": 0.0,
+          "j2_acceleration_m_s2": 1.734723475976807e-18,
+          "drag_acceleration_m_s2": 9.470116246213047e-22,
+          "altitude_m": 0.0,
+          "relative_density": 0.0,
+          "atmospheric_velocity_m_s": 2.8421709430404007e-13
+        },
+        "local_density_kg_m3": 8e-12,
+        "orekit_density_kg_m3": 8e-12,
+        "local_atmospheric_velocity_m_s": [
+          0.0,
+          493.7491066499997,
+          0.0
+        ],
+        "orekit_atmospheric_velocity_m_s": [
+          0.0,
+          493.74910665,
+          0.0
+        ],
+        "local_accelerations_m_s2": {
+          "central": [
+            -8.694250482823739,
+            -0.0,
+            -0.0
+          ],
+          "j2": [
+            -0.012528109018576447,
+            -0.0,
+            -0.0
+          ],
+          "drag": [
+            -0.0,
+            -2.772972509998776e-06,
+            -3.90297758591781e-06
+          ]
+        },
+        "orekit_accelerations_m_s2": {
+          "central": [
+            -8.694250482823739,
+            -0.0,
+            -0.0
+          ],
+          "j2": [
+            -0.012528109018576445,
+            0.0,
+            -0.0
+          ],
+          "drag": [
+            0.0,
+            -2.7729725099987764e-06,
+            -3.902977585917811e-06
+          ]
+        }
+      },
+      {
+        "state": "ascending_equator",
+        "elapsed_time_s": 86400.0,
+        "density_multiplier": 2.0,
+        "differences": {
+          "central_acceleration_m_s2": 0.0,
+          "j2_acceleration_m_s2": 1.734723475976807e-18,
+          "drag_acceleration_m_s2": 7.404637807859051e-20,
+          "altitude_m": 9.313225746154785e-10,
+          "relative_density": 1.5550026163716585e-14,
+          "atmospheric_velocity_m_s": 3.979039320256561e-13
+        },
+        "local_density_kg_m3": 8e-12,
+        "orekit_density_kg_m3": 7.999999999999875e-12,
+        "local_atmospheric_velocity_m_s": [
+          0.0,
+          493.7491066499997,
+          0.0
+        ],
+        "orekit_atmospheric_velocity_m_s": [
+          0.0,
+          493.7491066500001,
+          0.0
+        ],
+        "local_accelerations_m_s2": {
+          "central": [
+            -8.694250482823739,
+            -0.0,
+            -0.0
+          ],
+          "j2": [
+            -0.012528109018576447,
+            -0.0,
+            -0.0
+          ],
+          "drag": [
+            -0.0,
+            -2.772972509998776e-06,
+            -3.90297758591781e-06
+          ]
+        },
+        "orekit_accelerations_m_s2": {
+          "central": [
+            -8.694250482823739,
+            -0.0,
+            -0.0
+          ],
+          "j2": [
+            -0.012528109018576445,
+            0.0,
+            -0.0
+          ],
+          "drag": [
+            0.0,
+            -2.772972509998733e-06,
+            -3.90297758591775e-06
+          ]
+        }
+      },
+      {
+        "state": "ascending_equator",
+        "elapsed_time_s": 604800.0,
+        "density_multiplier": 2.0,
+        "differences": {
+          "central_acceleration_m_s2": 0.0,
+          "j2_acceleration_m_s2": 1.734723475976807e-18,
+          "drag_acceleration_m_s2": 7.44919610829744e-20,
+          "altitude_m": 9.313225746154785e-10,
+          "relative_density": 1.5550026163716585e-14,
+          "atmospheric_velocity_m_s": 8.489139145240188e-15
+        },
+        "local_density_kg_m3": 8e-12,
+        "orekit_density_kg_m3": 8.000000000000124e-12,
+        "local_atmospheric_velocity_m_s": [
+          0.0,
+          493.7491066499997,
+          0.0
+        ],
+        "orekit_atmospheric_velocity_m_s": [
+          8.489139145240188e-15,
+          493.7491066499997,
+          0.0
+        ],
+        "local_accelerations_m_s2": {
+          "central": [
+            -8.694250482823739,
+            -0.0,
+            -0.0
+          ],
+          "j2": [
+            -0.012528109018576447,
+            -0.0,
+            -0.0
+          ],
+          "drag": [
+            -0.0,
+            -2.772972509998776e-06,
+            -3.90297758591781e-06
+          ]
+        },
+        "orekit_accelerations_m_s2": {
+          "central": [
+            -8.694250482823739,
+            -0.0,
+            -0.0
+          ],
+          "j2": [
+            -0.012528109018576445,
+            0.0,
+            -0.0
+          ],
+          "drag": [
+            5.510246245581322e-24,
+            -2.772972509998819e-06,
+            -3.902977585917871e-06
+          ]
+        }
+      },
+      {
+        "state": "opposite_equator",
+        "elapsed_time_s": 0.0,
+        "density_multiplier": 2.0,
+        "differences": {
+          "central_acceleration_m_s2": 0.0,
+          "j2_acceleration_m_s2": 1.734723475976807e-18,
+          "drag_acceleration_m_s2": 9.470116246213047e-22,
+          "altitude_m": 0.0,
+          "relative_density": 0.0,
+          "atmospheric_velocity_m_s": 2.8421709430404007e-13
+        },
+        "local_density_kg_m3": 8e-12,
+        "orekit_density_kg_m3": 8e-12,
+        "local_atmospheric_velocity_m_s": [
+          0.0,
+          -493.7491066499997,
+          0.0
+        ],
+        "orekit_atmospheric_velocity_m_s": [
+          0.0,
+          -493.74910665,
+          0.0
+        ],
+        "local_accelerations_m_s2": {
+          "central": [
+            8.694250482823739,
+            0.0,
+            0.0
+          ],
+          "j2": [
+            0.012528109018576447,
+            0.0,
+            0.0
+          ],
+          "drag": [
+            0.0,
+            2.772972509998776e-06,
+            3.90297758591781e-06
+          ]
+        },
+        "orekit_accelerations_m_s2": {
+          "central": [
+            8.694250482823739,
+            0.0,
+            0.0
+          ],
+          "j2": [
+            0.012528109018576445,
+            0.0,
+            0.0
+          ],
+          "drag": [
+            0.0,
+            2.7729725099987764e-06,
+            3.902977585917811e-06
+          ]
+        }
+      },
+      {
+        "state": "opposite_equator",
+        "elapsed_time_s": 86400.0,
+        "density_multiplier": 2.0,
+        "differences": {
+          "central_acceleration_m_s2": 0.0,
+          "j2_acceleration_m_s2": 1.734723475976807e-18,
+          "drag_acceleration_m_s2": 7.404637807859051e-20,
+          "altitude_m": 9.313225746154785e-10,
+          "relative_density": 1.5550026163716585e-14,
+          "atmospheric_velocity_m_s": 3.979039320256561e-13
+        },
+        "local_density_kg_m3": 8e-12,
+        "orekit_density_kg_m3": 7.999999999999875e-12,
+        "local_atmospheric_velocity_m_s": [
+          0.0,
+          -493.7491066499997,
+          0.0
+        ],
+        "orekit_atmospheric_velocity_m_s": [
+          0.0,
+          -493.7491066500001,
+          0.0
+        ],
+        "local_accelerations_m_s2": {
+          "central": [
+            8.694250482823739,
+            0.0,
+            0.0
+          ],
+          "j2": [
+            0.012528109018576447,
+            0.0,
+            0.0
+          ],
+          "drag": [
+            0.0,
+            2.772972509998776e-06,
+            3.90297758591781e-06
+          ]
+        },
+        "orekit_accelerations_m_s2": {
+          "central": [
+            8.694250482823739,
+            0.0,
+            0.0
+          ],
+          "j2": [
+            0.012528109018576445,
+            0.0,
+            0.0
+          ],
+          "drag": [
+            0.0,
+            2.772972509998733e-06,
+            3.90297758591775e-06
+          ]
+        }
+      },
+      {
+        "state": "opposite_equator",
+        "elapsed_time_s": 604800.0,
+        "density_multiplier": 2.0,
+        "differences": {
+          "central_acceleration_m_s2": 0.0,
+          "j2_acceleration_m_s2": 1.734723475976807e-18,
+          "drag_acceleration_m_s2": 7.44919610829744e-20,
+          "altitude_m": 9.313225746154785e-10,
+          "relative_density": 1.5550026163716585e-14,
+          "atmospheric_velocity_m_s": 8.489139145240188e-15
+        },
+        "local_density_kg_m3": 8e-12,
+        "orekit_density_kg_m3": 8.000000000000124e-12,
+        "local_atmospheric_velocity_m_s": [
+          0.0,
+          -493.7491066499997,
+          0.0
+        ],
+        "orekit_atmospheric_velocity_m_s": [
+          -8.489139145240188e-15,
+          -493.7491066499997,
+          0.0
+        ],
+        "local_accelerations_m_s2": {
+          "central": [
+            8.694250482823739,
+            0.0,
+            0.0
+          ],
+          "j2": [
+            0.012528109018576447,
+            0.0,
+            0.0
+          ],
+          "drag": [
+            0.0,
+            2.772972509998776e-06,
+            3.90297758591781e-06
+          ]
+        },
+        "orekit_accelerations_m_s2": {
+          "central": [
+            8.694250482823739,
+            0.0,
+            0.0
+          ],
+          "j2": [
+            0.012528109018576445,
+            0.0,
+            0.0
+          ],
+          "drag": [
+            -5.510246245581322e-24,
+            2.772972509998819e-06,
+            3.902977585917871e-06
+          ]
+        }
+      },
+      {
+        "state": "north_oblique",
+        "elapsed_time_s": 0.0,
+        "density_multiplier": 2.0,
+        "differences": {
+          "central_acceleration_m_s2": 1.3322676295501878e-15,
+          "j2_acceleration_m_s2": 4.470280076681873e-18,
+          "drag_acceleration_m_s2": 5.893121779567184e-20,
+          "altitude_m": 6.984919309616089e-10,
+          "relative_density": 1.1453356739396346e-14,
+          "atmospheric_velocity_m_s": 3.4224270219716276e-13
+        },
+        "local_density_kg_m3": 9.450883302925167e-12,
+        "orekit_density_kg_m3": 9.450883302925059e-12,
+        "local_atmospheric_velocity_m_s": [
+          -199.97680770977968,
+          249.97100963722414,
+          0.0
+        ],
+        "orekit_atmospheric_velocity_m_s": [
+          -199.97680770977934,
+          249.97100963722417,
+          0.0
+        ],
+        "local_accelerations_m_s2": {
+          "central": [
+            -4.421209588136347,
+            -3.536967670509078,
+            -6.63181438220452
+          ],
+          "j2": [
+            0.012089447335844826,
+            0.009671557868675861,
+            -0.0010348304105410693
+          ],
+          "drag": [
+            3.514487508697193e-06,
+            -2.379610646023544e-06,
+            -2.9287254397788325e-06
+          ]
+        },
+        "orekit_accelerations_m_s2": {
+          "central": [
+            -4.421209588136348,
+            -3.5369676705090782,
+            -6.631814382204521
+          ],
+          "j2": [
+            0.012089447335844824,
+            0.009671557868675861,
+            -0.0010348304105410652
+          ],
+          "drag": [
+            3.5144875086971526e-06,
+            -2.379610646023517e-06,
+            -2.928725439778799e-06
+          ]
+        }
+      },
+      {
+        "state": "north_oblique",
+        "elapsed_time_s": 86400.0,
+        "density_multiplier": 2.0,
+        "differences": {
+          "central_acceleration_m_s2": 1.3322676295501878e-15,
+          "j2_acceleration_m_s2": 4.470280076681873e-18,
+          "drag_acceleration_m_s2": 5.893121779567184e-20,
+          "altitude_m": 6.984919309616089e-10,
+          "relative_density": 1.1453356739396346e-14,
+          "atmospheric_velocity_m_s": 2.8563464471519893e-13
+        },
+        "local_density_kg_m3": 9.450883302925167e-12,
+        "orekit_density_kg_m3": 9.450883302925059e-12,
+        "local_atmospheric_velocity_m_s": [
+          -199.97680770977968,
+          249.97100963722414,
+          0.0
+        ],
+        "orekit_atmospheric_velocity_m_s": [
+          -199.9768077097794,
+          249.97100963722417,
+          0.0
+        ],
+        "local_accelerations_m_s2": {
+          "central": [
+            -4.421209588136347,
+            -3.536967670509078,
+            -6.63181438220452
+          ],
+          "j2": [
+            0.012089447335844826,
+            0.009671557868675861,
+            -0.0010348304105410693
+          ],
+          "drag": [
+            3.514487508697193e-06,
+            -2.379610646023544e-06,
+            -2.9287254397788325e-06
+          ]
+        },
+        "orekit_accelerations_m_s2": {
+          "central": [
+            -4.421209588136348,
+            -3.5369676705090782,
+            -6.631814382204521
+          ],
+          "j2": [
+            0.012089447335844824,
+            0.009671557868675861,
+            -0.0010348304105410652
+          ],
+          "drag": [
+            3.5144875086971526e-06,
+            -2.379610646023517e-06,
+            -2.928725439778799e-06
+          ]
+        }
+      },
+      {
+        "state": "north_oblique",
+        "elapsed_time_s": 604800.0,
+        "density_multiplier": 2.0,
+        "differences": {
+          "central_acceleration_m_s2": 1.3322676295501878e-15,
+          "j2_acceleration_m_s2": 4.470280076681873e-18,
+          "drag_acceleration_m_s2": 2.6019598930845746e-19,
+          "altitude_m": 3.026798367500305e-09,
+          "relative_density": 5.042895877793913e-14,
+          "atmospheric_velocity_m_s": 3.8131724593878115e-13
+        },
+        "local_density_kg_m3": 9.450883302925167e-12,
+        "orekit_density_kg_m3": 9.450883302925644e-12,
+        "local_atmospheric_velocity_m_s": [
+          -199.97680770977968,
+          249.97100963722414,
+          0.0
+        ],
+        "orekit_atmospheric_velocity_m_s": [
+          -199.97680770977934,
+          249.97100963722397,
+          0.0
+        ],
+        "local_accelerations_m_s2": {
+          "central": [
+            -4.421209588136347,
+            -3.536967670509078,
+            -6.63181438220452
+          ],
+          "j2": [
+            0.012089447335844826,
+            0.009671557868675861,
+            -0.0010348304105410693
+          ],
+          "drag": [
+            3.514487508697193e-06,
+            -2.379610646023544e-06,
+            -2.9287254397788325e-06
+          ]
+        },
+        "orekit_accelerations_m_s2": {
+          "central": [
+            -4.421209588136348,
+            -3.5369676705090782,
+            -6.631814382204521
+          ],
+          "j2": [
+            0.012089447335844824,
+            0.009671557868675861,
+            -0.0010348304105410652
+          ],
+          "drag": [
+            3.5144875086973703e-06,
+            -2.379610646023664e-06,
+            -2.9287254397789803e-06
+          ]
+        }
+      },
+      {
+        "state": "south_oblique",
+        "elapsed_time_s": 0.0,
+        "density_multiplier": 2.0,
+        "differences": {
+          "central_acceleration_m_s2": 2.0350724194510405e-15,
+          "j2_acceleration_m_s2": 9.055522398700297e-18,
+          "drag_acceleration_m_s2": 2.7690982641981846e-20,
+          "altitude_m": 6.984919309616089e-10,
+          "relative_density": 1.1653481316392475e-14,
+          "atmospheric_velocity_m_s": 4.687428401686771e-13
+        },
+        "local_density_kg_m3": 4.852245277700992e-12,
+        "orekit_density_kg_m3": 4.8522452777010486e-12,
+        "local_atmospheric_velocity_m_s": [
+          348.0268763072436,
+          223.73156334037049,
+          0.0
+        ],
+        "orekit_atmospheric_velocity_m_s": [
+          348.0268763072431,
+          223.7315633403706,
+          0.0
+        ],
+        "local_accelerations_m_s2": {
+          "central": [
+            -3.887704071734433,
+            6.04753966714245,
+            4.751638309897641
+          ],
+          "j2": [
+            0.002887978305681396,
+            -0.004492410697726616,
+            0.010043591756580667
+          ],
+          "drag": [
+            -1.672068975997759e-06,
+            -9.978802969298835e-07,
+            1.4377288359486165e-06
+          ]
+        },
+        "orekit_accelerations_m_s2": {
+          "central": [
+            -3.8877040717344333,
+            6.047539667142452,
+            4.751638309897642
+          ],
+          "j2": [
+            0.0028879783056813984,
+            -0.004492410697726621,
+            0.01004359175658066
+          ],
+          "drag": [
+            -1.672068975997778e-06,
+            -9.97880296929895e-07,
+            1.437728835948633e-06
+          ]
+        }
+      },
+      {
+        "state": "south_oblique",
+        "elapsed_time_s": 86400.0,
+        "density_multiplier": 2.0,
+        "differences": {
+          "central_acceleration_m_s2": 2.0350724194510405e-15,
+          "j2_acceleration_m_s2": 9.055522398700297e-18,
+          "drag_acceleration_m_s2": 6.840348284897485e-20,
+          "altitude_m": 1.6880221664905548e-09,
+          "relative_density": 2.813483346386183e-14,
+          "atmospheric_velocity_m_s": 5.934627159212227e-13
+        },
+        "local_density_kg_m3": 4.852245277700992e-12,
+        "orekit_density_kg_m3": 4.8522452777011286e-12,
+        "local_atmospheric_velocity_m_s": [
+          348.0268763072436,
+          223.73156334037049,
+          0.0
+        ],
+        "orekit_atmospheric_velocity_m_s": [
+          348.026876307243,
+          223.73156334037066,
+          0.0
+        ],
+        "local_accelerations_m_s2": {
+          "central": [
+            -3.887704071734433,
+            6.04753966714245,
+            4.751638309897641
+          ],
+          "j2": [
+            0.002887978305681396,
+            -0.004492410697726616,
+            0.010043591756580667
+          ],
+          "drag": [
+            -1.672068975997759e-06,
+            -9.978802969298835e-07,
+            1.4377288359486165e-06
+          ]
+        },
+        "orekit_accelerations_m_s2": {
+          "central": [
+            -3.8877040717344333,
+            6.047539667142452,
+            4.751638309897642
+          ],
+          "j2": [
+            0.0028879783056813984,
+            -0.004492410697726621,
+            0.01004359175658066
+          ],
+          "drag": [
+            -1.6720689759978064e-06,
+            -9.978802969299116e-07,
+            1.437728835948657e-06
+          ]
+        }
+      },
+      {
+        "state": "south_oblique",
+        "elapsed_time_s": 604800.0,
+        "density_multiplier": 2.0,
+        "differences": {
+          "central_acceleration_m_s2": 2.0350724194510405e-15,
+          "j2_acceleration_m_s2": 9.055522398700297e-18,
+          "drag_acceleration_m_s2": 6.811048232470761e-20,
+          "altitude_m": 1.6880221664905548e-09,
+          "relative_density": 2.813483346386183e-14,
+          "atmospheric_velocity_m_s": 4.556346636343676e-13
+        },
+        "local_density_kg_m3": 4.852245277700992e-12,
+        "orekit_density_kg_m3": 4.8522452777011286e-12,
+        "local_atmospheric_velocity_m_s": [
+          348.0268763072436,
+          223.73156334037049,
+          0.0
+        ],
+        "orekit_atmospheric_velocity_m_s": [
+          348.0268763072431,
+          223.73156334037046,
+          0.0
+        ],
+        "local_accelerations_m_s2": {
+          "central": [
+            -3.887704071734433,
+            6.04753966714245,
+            4.751638309897641
+          ],
+          "j2": [
+            0.002887978305681396,
+            -0.004492410697726616,
+            0.010043591756580667
+          ],
+          "drag": [
+            -1.672068975997759e-06,
+            -9.978802969298835e-07,
+            1.4377288359486165e-06
+          ]
+        },
+        "orekit_accelerations_m_s2": {
+          "central": [
+            -3.8877040717344333,
+            6.047539667142452,
+            4.751638309897642
+          ],
+          "j2": [
+            0.0028879783056813984,
+            -0.004492410697726621,
+            0.01004359175658066
+          ],
+          "drag": [
+            -1.672068975997806e-06,
+            -9.978802969299116e-07,
+            1.437728835948657e-06
+          ]
+        }
+      },
+      {
+        "state": "near_pole",
+        "elapsed_time_s": 0.0,
+        "density_multiplier": 2.0,
+        "differences": {
+          "central_acceleration_m_s2": 1.7763568526351403e-15,
+          "j2_acceleration_m_s2": 8.470329472543003e-22,
+          "drag_acceleration_m_s2": 4.273583420165722e-20,
+          "altitude_m": 5.238689482212067e-10,
+          "relative_density": 8.683780844672764e-15,
+          "atmospheric_velocity_m_s": 4.353462035311395e-14
+        },
+        "local_density_kg_m3": 8.000000000000124e-12,
+        "orekit_density_kg_m3": 8.000000000000194e-12,
+        "local_atmospheric_velocity_m_s": [
+          0.0,
+          0.07292114999995647,
+          0.0
+        ],
+        "orekit_atmospheric_velocity_m_s": [
+          0.0,
+          0.07292115,
+          0.0
+        ],
+        "local_accelerations_m_s2": {
+          "central": [
+            -0.0012840423102678691,
+            -0.0,
+            -8.69425038800449
+          ],
+          "j2": [
+            7.401038946683469e-06,
+            0.0,
+            0.025056216397578462
+          ],
+          "drag": [
+            -4.862674577900513e-06,
+            -6.570702683889483e-07,
+            -0.0
+          ]
+        },
+        "orekit_accelerations_m_s2": {
+          "central": [
+            -0.001284042310267869,
+            -0.0,
+            -8.694250388004487
+          ],
+          "j2": [
+            7.40103894668347e-06,
+            0.0,
+            0.025056216397578462
+          ],
+          "drag": [
+            -4.862674577900556e-06,
+            -6.57070268388954e-07,
+            0.0
+          ]
+        }
+      },
+      {
+        "state": "near_pole",
+        "elapsed_time_s": 86400.0,
+        "density_multiplier": 2.0,
+        "differences": {
+          "central_acceleration_m_s2": 1.7763568526351403e-15,
+          "j2_acceleration_m_s2": 8.470329472543003e-22,
+          "drag_acceleration_m_s2": 4.273583420165722e-20,
+          "altitude_m": 5.238689482212067e-10,
+          "relative_density": 8.683780844672764e-15,
+          "atmospheric_velocity_m_s": 4.3548498141692356e-14
+        },
+        "local_density_kg_m3": 8.000000000000124e-12,
+        "orekit_density_kg_m3": 8.000000000000194e-12,
+        "local_atmospheric_velocity_m_s": [
+          0.0,
+          0.07292114999995647,
+          0.0
+        ],
+        "orekit_atmospheric_velocity_m_s": [
+          -2.5906796707886314e-19,
+          0.07292115000000002,
+          0.0
+        ],
+        "local_accelerations_m_s2": {
+          "central": [
+            -0.0012840423102678691,
+            -0.0,
+            -8.69425038800449
+          ],
+          "j2": [
+            7.401038946683469e-06,
+            0.0,
+            0.025056216397578462
+          ],
+          "drag": [
+            -4.862674577900513e-06,
+            -6.570702683889483e-07,
+            -0.0
+          ]
+        },
+        "orekit_accelerations_m_s2": {
+          "central": [
+            -0.001284042310267869,
+            -0.0,
+            -8.694250388004487
+          ],
+          "j2": [
+            7.40103894668347e-06,
+            0.0,
+            0.025056216397578462
+          ],
+          "drag": [
+            -4.862674577900556e-06,
+            -6.57070268388954e-07,
+            0.0
+          ]
+        }
+      },
+      {
+        "state": "near_pole",
+        "elapsed_time_s": 604800.0,
+        "density_multiplier": 2.0,
+        "differences": {
+          "central_acceleration_m_s2": 1.7763568526351403e-15,
+          "j2_acceleration_m_s2": 8.470329472543003e-22,
+          "drag_acceleration_m_s2": 8.973959556488114e-20,
+          "altitude_m": 1.1059455573558807e-09,
+          "relative_density": 1.8377303648028407e-14,
+          "atmospheric_velocity_m_s": 4.349298700203571e-14
+        },
+        "local_density_kg_m3": 8.000000000000124e-12,
+        "orekit_density_kg_m3": 8.000000000000271e-12,
+        "local_atmospheric_velocity_m_s": [
+          0.0,
+          0.07292114999995647,
+          0.0
+        ],
+        "orekit_atmospheric_velocity_m_s": [
+          1.0362718683154526e-18,
+          0.07292114999999996,
+          0.0
+        ],
+        "local_accelerations_m_s2": {
+          "central": [
+            -0.0012840423102678691,
+            -0.0,
+            -8.69425038800449
+          ],
+          "j2": [
+            7.401038946683469e-06,
+            0.0,
+            0.025056216397578462
+          ],
+          "drag": [
+            -4.862674577900513e-06,
+            -6.570702683889483e-07,
+            -0.0
+          ]
+        },
+        "orekit_accelerations_m_s2": {
+          "central": [
+            -0.001284042310267869,
+            -0.0,
+            -8.694250388004487
+          ],
+          "j2": [
+            7.40103894668347e-06,
+            0.0,
+            0.025056216397578462
+          ],
+          "drag": [
+            -4.862674577900602e-06,
+            -6.570702683889602e-07,
+            0.0
+          ]
+        }
+      }
+    ]
+  },
+  "agreement_gate": {
+    "both_reference_max_position_m": 0.05,
+    "both_reference_max_velocity_m_s": 5e-05,
+    "meaning": "Consistency gate before subsequent cases; not a real-world accuracy bound."
+  },
+  "cases": {
+    "central": {
+      "name": "central",
+      "j2": 0.0,
+      "drag": null,
+      "requested_duration_s": 86400.0,
+      "output_interval_s": 10.0,
+      "stop_altitude_m": 200000.0,
+      "common_comparison_end_s": 86400.0,
+      "difference_convention": "Orekit minus SciPy for cross-library pairs; RTN frame follows the stated SciPy level.",
+      "solver_runs": {
+        "scipy": {
+          "nominal": {
+            "rtol": 1e-10,
+            "cartesian_atol_si": [
+              0.0001,
+              0.0001,
+              0.0001,
+              1e-07,
+              1e-07,
+              1e-07
+            ],
+            "end_time_s": 86400.0,
+            "output_samples": 8641,
+            "stopped_at_altitude_limit": false,
+            "rhs_evaluations": 6302
+          },
+          "tighter": {
+            "rtol": 1e-12,
+            "cartesian_atol_si": [
+              1e-06,
+              1e-06,
+              1e-06,
+              9.999999999999999e-10,
+              9.999999999999999e-10,
+              9.999999999999999e-10
+            ],
+            "end_time_s": 86400.0,
+            "output_samples": 8641,
+            "stopped_at_altitude_limit": false,
+            "rhs_evaluations": 11207
+          },
+          "reference": {
+            "rtol": 1e-13,
+            "cartesian_atol_si": [
+              1.0000000000000001e-07,
+              1.0000000000000001e-07,
+              1.0000000000000001e-07,
+              9.999999999999999e-11,
+              9.999999999999999e-11,
+              9.999999999999999e-11
+            ],
+            "end_time_s": 86400.0,
+            "output_samples": 8641,
+            "stopped_at_altitude_limit": false,
+            "rhs_evaluations": 14942
+          }
+        },
+        "orekit": {
+          "nominal": {
+            "rtol": 1e-10,
+            "cartesian_atol_si": [
+              0.0001,
+              0.0001,
+              0.0001,
+              1e-07,
+              1e-07,
+              1e-07
+            ],
+            "end_time_s": 86400.0,
+            "output_samples": 8641,
+            "stopped_at_altitude_limit": false,
+            "rhs_evaluations": 6242,
+            "mass_atol_kg": 1e-09,
+            "force_models": [
+              "NewtonianAttraction"
+            ],
+            "final_mass_kg": 1000.0
+          },
+          "tighter": {
+            "rtol": 1e-12,
+            "cartesian_atol_si": [
+              1e-06,
+              1e-06,
+              1e-06,
+              9.999999999999999e-10,
+              9.999999999999999e-10,
+              9.999999999999999e-10
+            ],
+            "end_time_s": 86400.0,
+            "output_samples": 8641,
+            "stopped_at_altitude_limit": false,
+            "rhs_evaluations": 11102,
+            "mass_atol_kg": 1.0000000000000001e-11,
+            "force_models": [
+              "NewtonianAttraction"
+            ],
+            "final_mass_kg": 1000.0
+          },
+          "reference": {
+            "rtol": 1e-13,
+            "cartesian_atol_si": [
+              1.0000000000000001e-07,
+              1.0000000000000001e-07,
+              1.0000000000000001e-07,
+              9.999999999999999e-11,
+              9.999999999999999e-11,
+              9.999999999999999e-11
+            ],
+            "end_time_s": 86400.0,
+            "output_samples": 8641,
+            "stopped_at_altitude_limit": false,
+            "rhs_evaluations": 14807,
+            "mass_atol_kg": 1e-12,
+            "force_models": [
+              "NewtonianAttraction"
+            ],
+            "final_mass_kg": 1000.0
+          }
+        }
+      },
+      "comparisons": {
+        "both_nominal": {
+          "max_position_difference_m": 0.002006716606786196,
+          "max_velocity_difference_m_s": 9.771297236121629e-07,
+          "checkpoints_elapsed_s": {
+            "86400": {
+              "available": true,
+              "position_difference_m": 0.0008287163383588926,
+              "velocity_difference_m_s": 9.48194757788668e-07,
+              "position_difference_rtn_m": [
+                -2.3408795203296186e-05,
+                0.0008283856570275117,
+                3.1641719889358415e-08
+              ]
+            },
+            "259200": {
+              "available": false
+            },
+            "604800": {
+              "available": false
+            }
+          }
+        },
+        "only_scipy_tighter": {
+          "max_position_difference_m": 0.007094651733835344,
+          "max_velocity_difference_m_s": 7.845148162620519e-06,
+          "checkpoints_elapsed_s": {
+            "86400": {
+              "available": true,
+              "position_difference_m": 0.0064038002436897605,
+              "velocity_difference_m_s": 7.346950497356206e-06,
+              "position_difference_rtn_m": [
+                -0.00023898989834264008,
+                0.006399339136892706,
+                2.458727262023494e-08
+              ]
+            },
+            "259200": {
+              "available": false
+            },
+            "604800": {
+              "available": false
+            }
+          }
+        },
+        "only_orekit_tighter": {
+          "max_position_difference_m": 0.006618973901309828,
+          "max_velocity_difference_m_s": 7.318804356234598e-06,
+          "checkpoints_elapsed_s": {
+            "86400": {
+              "available": true,
+              "position_difference_m": 0.005572017921243799,
+              "velocity_difference_m_s": 6.395166351505379e-06,
+              "position_difference_rtn_m": [
+                0.00021545120536021144,
+                -0.005567850976027166,
+                3.904146481797932e-08
+              ]
+            },
+            "259200": {
+              "available": false
+            },
+            "604800": {
+              "available": false
+            }
+          }
+        },
+        "both_tighter": {
+          "max_position_difference_m": 1.992969267741929e-05,
+          "max_velocity_difference_m_s": 6.183878495433975e-09,
+          "checkpoints_elapsed_s": {
+            "86400": {
+              "available": true,
+              "position_difference_m": 3.1053866940467937e-06,
+              "velocity_difference_m_s": 3.6045107514376455e-09,
+              "position_difference_rtn_m": [
+                -1.2989251652161885e-07,
+                3.102504034553713e-06,
+                3.1987017561665525e-08
+              ]
+            },
+            "259200": {
+              "available": false
+            },
+            "604800": {
+              "available": false
+            }
+          }
+        },
+        "both_reference": {
+          "max_position_difference_m": 2.1318220936068822e-06,
+          "max_velocity_difference_m_s": 1.2525991635363092e-09,
+          "checkpoints_elapsed_s": {
+            "86400": {
+              "available": true,
+              "position_difference_m": 2.1535022158336312e-07,
+              "velocity_difference_m_s": 2.675429818303289e-10,
+              "position_difference_rtn_m": [
+                -1.317080349147654e-08,
+                2.1486881470193393e-07,
+                5.80002930841556e-09
+              ]
+            },
+            "259200": {
+              "available": false
+            },
+            "604800": {
+              "available": false
+            }
+          }
+        },
+        "scipy_nominal_vs_reference": {
+          "max_position_difference_m": 0.0067060413746337375,
+          "max_velocity_difference_m_s": 7.416116028803935e-06,
+          "checkpoints_elapsed_s": {
+            "86400": {
+              "available": true,
+              "position_difference_m": 0.005493138389630569,
+              "velocity_difference_m_s": 6.3062699580154505e-06,
+              "position_difference_rtn_m": [
+                -0.00021571886908816336,
+                0.005488901050013571,
+                -1.7673539028095764e-08
+              ]
+            },
+            "259200": {
+              "available": false
+            },
+            "604800": {
+              "available": false
+            }
+          }
+        },
+        "scipy_tighter_vs_reference": {
+          "max_position_difference_m": 9.87460442463951e-05,
+          "max_velocity_difference_m_s": 1.1031486741602232e-07,
+          "checkpoints_elapsed_s": {
+            "86400": {
+              "available": true,
+              "position_difference_m": 8.20525462162688e-05,
+              "velocity_difference_m_s": 9.251665374298925e-08,
+              "position_difference_rtn_m": [
+                -1.3776669789790022e-07,
+                -8.20524298734947e-05,
+                -1.0619091764081591e-08
+              ]
+            },
+            "259200": {
+              "available": false
+            },
+            "604800": {
+              "available": false
+            }
+          }
+        },
+        "orekit_nominal_vs_reference": {
+          "max_position_difference_m": 0.007177633253810817,
+          "max_velocity_difference_m_s": 7.937115535131037e-06,
+          "checkpoints_elapsed_s": {
+            "86400": {
+              "available": true,
+              "position_difference_m": 0.0063215957123543545,
+              "velocity_difference_m_s": 7.254181566777911e-06,
+              "position_difference_rtn_m": [
+                -0.00023911449415929737,
+                0.006317071838207414,
+                8.168151539693358e-09
+              ]
+            },
+            "259200": {
+              "available": false
+            },
+            "604800": {
+              "available": false
+            }
+          }
+        },
+        "orekit_tighter_vs_reference": {
+          "max_position_difference_m": 0.0001006022964872873,
+          "max_velocity_difference_m_s": 1.1224064519882309e-07,
+          "checkpoints_elapsed_s": {
+            "86400": {
+              "available": true,
+              "position_difference_m": 7.91652052309844e-05,
+              "velocity_difference_m_s": 8.918003262913186e-08,
+              "position_difference_rtn_m": [
+                -2.5448841089296156e-07,
+                -7.916479465364135e-05,
+                1.5567896489327457e-08
+              ]
+            },
+            "259200": {
+              "available": false
+            },
+            "604800": {
+              "available": false
+            }
+          }
+        }
+      },
+      "circular_reference": {
+        "scipy": {
+          "nominal": {
+            "max_position_error_m": 0.006713993083086274,
+            "max_velocity_error_m_s": 7.425035082219103e-06
+          },
+          "tighter": {
+            "max_position_error_m": 0.00010726150246992818,
+            "max_velocity_error_m_s": 1.197827820895648e-07
+          },
+          "reference": {
+            "max_position_error_m": 8.757277982781204e-06,
+            "max_velocity_error_m_s": 9.723390016742432e-09
+          }
+        },
+        "orekit": {
+          "nominal": {
+            "max_position_error_m": 0.007186353238975767,
+            "max_velocity_error_m_s": 7.946822913305684e-06
+          },
+          "tighter": {
+            "max_position_error_m": 0.00010988757728168022,
+            "max_velocity_error_m_s": 1.2259920699345795e-07
+          },
+          "reference": {
+            "max_position_error_m": 9.718192135865116e-06,
+            "max_velocity_error_m_s": 1.0819730606329957e-08
+          }
+        }
+      }
+    },
+    "j2": {
+      "name": "j2",
+      "j2": 0.00108263,
+      "drag": null,
+      "requested_duration_s": 604800.0,
+      "output_interval_s": 60.0,
+      "stop_altitude_m": 200000.0,
+      "common_comparison_end_s": 604800.0,
+      "difference_convention": "Orekit minus SciPy for cross-library pairs; RTN frame follows the stated SciPy level.",
+      "solver_runs": {
+        "scipy": {
+          "nominal": {
+            "rtol": 1e-10,
+            "cartesian_atol_si": [
+              0.0001,
+              0.0001,
+              0.0001,
+              1e-07,
+              1e-07,
+              1e-07
+            ],
+            "end_time_s": 604800.0,
+            "output_samples": 10081,
+            "stopped_at_altitude_limit": false,
+            "rhs_evaluations": 43877
+          },
+          "tighter": {
+            "rtol": 1e-12,
+            "cartesian_atol_si": [
+              1e-06,
+              1e-06,
+              1e-06,
+              9.999999999999999e-10,
+              9.999999999999999e-10,
+              9.999999999999999e-10
+            ],
+            "end_time_s": 604800.0,
+            "output_samples": 10081,
+            "stopped_at_altitude_limit": false,
+            "rhs_evaluations": 78257
+          },
+          "reference": {
+            "rtol": 1e-13,
+            "cartesian_atol_si": [
+              1.0000000000000001e-07,
+              1.0000000000000001e-07,
+              1.0000000000000001e-07,
+              9.999999999999999e-11,
+              9.999999999999999e-11,
+              9.999999999999999e-11
+            ],
+            "end_time_s": 604800.0,
+            "output_samples": 10081,
+            "stopped_at_altitude_limit": false,
+            "rhs_evaluations": 104462
+          }
+        },
+        "orekit": {
+          "nominal": {
+            "rtol": 1e-10,
+            "cartesian_atol_si": [
+              0.0001,
+              0.0001,
+              0.0001,
+              1e-07,
+              1e-07,
+              1e-07
+            ],
+            "end_time_s": 604800.0,
+            "output_samples": 10081,
+            "stopped_at_altitude_limit": false,
+            "rhs_evaluations": 43457,
+            "mass_atol_kg": 1e-09,
+            "force_models": [
+              "HolmesFeatherstoneAttractionModel",
+              "NewtonianAttraction"
+            ],
+            "final_mass_kg": 1000.0
+          },
+          "tighter": {
+            "rtol": 1e-12,
+            "cartesian_atol_si": [
+              1e-06,
+              1e-06,
+              1e-06,
+              9.999999999999999e-10,
+              9.999999999999999e-10,
+              9.999999999999999e-10
+            ],
+            "end_time_s": 604800.0,
+            "output_samples": 10081,
+            "stopped_at_altitude_limit": false,
+            "rhs_evaluations": 77507,
+            "mass_atol_kg": 1.0000000000000001e-11,
+            "force_models": [
+              "HolmesFeatherstoneAttractionModel",
+              "NewtonianAttraction"
+            ],
+            "final_mass_kg": 1000.0
+          },
+          "reference": {
+            "rtol": 1e-13,
+            "cartesian_atol_si": [
+              1.0000000000000001e-07,
+              1.0000000000000001e-07,
+              1.0000000000000001e-07,
+              9.999999999999999e-11,
+              9.999999999999999e-11,
+              9.999999999999999e-11
+            ],
+            "end_time_s": 604800.0,
+            "output_samples": 10081,
+            "stopped_at_altitude_limit": false,
+            "rhs_evaluations": 103457,
+            "mass_atol_kg": 1e-12,
+            "force_models": [
+              "HolmesFeatherstoneAttractionModel",
+              "NewtonianAttraction"
+            ],
+            "final_mass_kg": 1000.0
+          }
+        }
+      },
+      "comparisons": {
+        "both_nominal": {
+          "max_position_difference_m": 0.13278799958637819,
+          "max_velocity_difference_m_s": 0.00015053604248819162,
+          "checkpoints_elapsed_s": {
+            "86400": {
+              "available": true,
+              "position_difference_m": 0.0006670804197250034,
+              "velocity_difference_m_s": 7.656122180875984e-07,
+              "position_difference_rtn_m": [
+                -6.884985421479995e-05,
+                0.0006635176233304724,
+                -5.894785566118227e-07
+              ]
+            },
+            "259200": {
+              "available": true,
+              "position_difference_m": 0.020601837314653013,
+              "velocity_difference_m_s": 2.3373878664705504e-05,
+              "position_difference_rtn_m": [
+                -0.000296435162084596,
+                0.020599701217597743,
+                1.1691014123482203e-05
+              ]
+            },
+            "604800": {
+              "available": true,
+              "position_difference_m": 0.13278799958637819,
+              "velocity_difference_m_s": 0.00015052738788229949,
+              "position_difference_rtn_m": [
+                -0.000261413957516235,
+                0.13278773538463196,
+                -4.2758809010216836e-05
+              ]
+            }
+          }
+        },
+        "only_scipy_tighter": {
+          "max_position_difference_m": 1.5469107832172828,
+          "max_velocity_difference_m_s": 0.0017536068607400268,
+          "checkpoints_elapsed_s": {
+            "86400": {
+              "available": true,
+              "position_difference_m": 0.004442589328098779,
+              "velocity_difference_m_s": 5.139886251257467e-06,
+              "position_difference_rtn_m": [
+                -0.0007795665350793883,
+                0.004373654573770204,
+                -4.650253805350141e-06
+              ]
+            },
+            "259200": {
+              "available": true,
+              "position_difference_m": 0.2336366132517847,
+              "velocity_difference_m_s": 0.0002650439514744554,
+              "position_difference_rtn_m": [
+                -0.002066769817989214,
+                0.2336274346775293,
+                0.00013145447973644808
+              ]
+            },
+            "604800": {
+              "available": true,
+              "position_difference_m": 1.5469107832172828,
+              "velocity_difference_m_s": 0.0017536068607400268,
+              "position_difference_rtn_m": [
+                -0.003052605629539129,
+                1.5469076908356334,
+                -0.0004988650588983456
+              ]
+            }
+          }
+        },
+        "only_orekit_tighter": {
+          "max_position_difference_m": 1.4132966361980086,
+          "max_velocity_difference_m_s": 0.0016021429101797284,
+          "checkpoints_elapsed_s": {
+            "86400": {
+              "available": true,
+              "position_difference_m": 0.003783909253979337,
+              "velocity_difference_m_s": 4.382486674112475e-06,
+              "position_difference_rtn_m": [
+                0.0007073371041093039,
+                -0.0037172068435487957,
+                4.092160153209082e-06
+              ]
+            },
+            "259200": {
+              "available": true,
+              "position_difference_m": 0.21293322571641035,
+              "velocity_difference_m_s": 0.0002415543888375843,
+              "position_difference_rtn_m": [
+                0.0017764399613294582,
+                -0.21292578176282795,
+                -0.0001197319845619299
+              ]
+            },
+            "604800": {
+              "available": true,
+              "position_difference_m": 1.4132966361980086,
+              "velocity_difference_m_s": 0.0016021429101797284,
+              "position_difference_rtn_m": [
+                0.002789451924418984,
+                -1.4132938098948666,
+                0.00045580634017680643
+              ]
+            }
+          }
+        },
+        "both_tighter": {
+          "max_position_difference_m": 0.0008262972644636696,
+          "max_velocity_difference_m_s": 9.365627481274228e-07,
+          "checkpoints_elapsed_s": {
+            "86400": {
+              "available": true,
+              "position_difference_m": 7.836191061680738e-06,
+              "velocity_difference_m_s": 8.224018323138558e-09,
+              "position_difference_rtn_m": [
+                -3.3795743509099685e-06,
+                -7.069892683057946e-06,
+                3.138489892092756e-08
+              ]
+            },
+            "259200": {
+              "available": true,
+              "position_difference_m": 0.00010213484923210111,
+              "velocity_difference_m_s": 1.1568407541652889e-07,
+              "position_difference_rtn_m": [
+                6.112657857518008e-06,
+                0.00010195176237532433,
+                3.146659103527561e-08
+              ]
+            },
+            "604800": {
+              "available": true,
+              "position_difference_m": 0.0008261474627875125,
+              "velocity_difference_m_s": 9.365627481274228e-07,
+              "position_difference_rtn_m": [
+                -1.4165222368913333e-06,
+                0.0008261461942168484,
+                -2.9919226923925827e-07
+              ]
+            }
+          }
+        },
+        "both_reference": {
+          "max_position_difference_m": 0.00027063474546248516,
+          "max_velocity_difference_m_s": 3.070374961678934e-07,
+          "checkpoints_elapsed_s": {
+            "86400": {
+              "available": true,
+              "position_difference_m": 5.4258028732169535e-06,
+              "velocity_difference_m_s": 6.163722374410237e-09,
+              "position_difference_rtn_m": [
+                6.090473365831078e-07,
+                5.3914816846773655e-06,
+                -1.7983453474587993e-08
+              ]
+            },
+            "259200": {
+              "available": true,
+              "position_difference_m": 5.0692079732477384e-05,
+              "velocity_difference_m_s": 5.7544481642217476e-08,
+              "position_difference_rtn_m": [
+                -6.137227258056282e-07,
+                5.068834125700392e-05,
+                4.8503950232444237e-08
+              ]
+            },
+            "604800": {
+              "available": true,
+              "position_difference_m": 0.00027063474546248516,
+              "velocity_difference_m_s": 3.070374961678934e-07,
+              "position_difference_rtn_m": [
+                -7.143490905102019e-07,
+                0.0002706337684331668,
+                -1.361638134236956e-07
+              ]
+            }
+          }
+        },
+        "scipy_nominal_vs_reference": {
+          "max_position_difference_m": 1.4204982076380581,
+          "max_velocity_difference_m_s": 0.0016103052220273581,
+          "checkpoints_elapsed_s": {
+            "86400": {
+              "available": true,
+              "position_difference_m": 0.0036911567406417187,
+              "velocity_difference_m_s": 4.2756196502849555e-06,
+              "position_difference_rtn_m": [
+                -0.0007128371720921177,
+                0.0036216688253320126,
+                -4.0211549023386715e-06
+              ]
+            },
+            "259200": {
+              "available": true,
+              "position_difference_m": 0.2138174121048142,
+              "velocity_difference_m_s": 0.00024255762786288312,
+              "position_difference_rtn_m": [
+                -0.0017807256739548333,
+                0.21380996299958016,
+                0.000120238896501694
+              ]
+            },
+            "604800": {
+              "available": true,
+              "position_difference_m": 1.4204982076380581,
+              "velocity_difference_m_s": 0.0016103052220273581,
+              "position_difference_rtn_m": [
+                -0.0027995719000219466,
+                1.4204953749980291,
+                -0.0004581586196655829
+              ]
+            }
+          }
+        },
+        "scipy_tighter_vs_reference": {
+          "max_position_difference_m": 0.00637542536787662,
+          "max_velocity_difference_m_s": 7.225751317845054e-06,
+          "checkpoints_elapsed_s": {
+            "86400": {
+              "available": true,
+              "position_difference_m": 8.849354339710384e-05,
+              "velocity_difference_m_s": 9.868247964090925e-08,
+              "position_difference_rtn_m": [
+                -2.1204916402589537e-06,
+                -8.8468125154808e-05,
+                3.962034726835679e-08
+              ]
+            },
+            "259200": {
+              "available": true,
+              "position_difference_m": 0.0007822986965831507,
+              "velocity_difference_m_s": 8.875608977491818e-07,
+              "position_difference_rtn_m": [
+                -1.0391641993362933e-05,
+                0.0007822295305194537,
+                4.754321121383325e-07
+              ]
+            },
+            "604800": {
+              "available": true,
+              "position_difference_m": 0.00637542536787662,
+              "velocity_difference_m_s": 7.225751317845054e-06,
+              "position_difference_rtn_m": [
+                -8.406655885317927e-06,
+                0.006375419494985342,
+                -2.052428415664923e-06
+              ]
+            }
+          }
+        },
+        "orekit_nominal_vs_reference": {
+          "max_position_difference_m": 1.553015572543686,
+          "max_velocity_difference_m_s": 0.0017605255724850693,
+          "checkpoints_elapsed_s": {
+            "86400": {
+              "available": true,
+              "position_difference_m": 0.004350707206751695,
+              "velocity_difference_m_s": 5.035062045561733e-06,
+              "position_difference_rtn_m": [
+                -0.0007822960739955775,
+                0.004279794966941545,
+                -4.592650004681684e-06
+              ]
+            },
+            "259200": {
+              "available": true,
+              "position_difference_m": 0.23436821246180659,
+              "velocity_difference_m_s": 0.0002658739623019434,
+              "position_difference_rtn_m": [
+                -0.0020765477625107193,
+                0.23435897586656834,
+                0.0001318814079492442
+              ]
+            },
+            "604800": {
+              "available": true,
+              "position_difference_m": 1.553015572543686,
+              "velocity_difference_m_s": 0.0017605255724850693,
+              "position_difference_rtn_m": [
+                -0.0030602993322059735,
+                1.5530124765594298,
+                -0.0005007813266187933
+              ]
+            }
+          }
+        },
+        "orekit_tighter_vs_reference": {
+          "max_position_difference_m": 0.00693093826039059,
+          "max_velocity_difference_m_s": 7.85527683145658e-06,
+          "checkpoints_elapsed_s": {
+            "86400": {
+              "available": true,
+              "position_difference_m": 0.0001011142574442559,
+              "velocity_difference_m_s": 1.1306279069539259e-07,
+              "position_difference_rtn_m": [
+                -6.1091133279250526e-06,
+                -0.00010092949952249423,
+                8.898869966406716e-08
+              ]
+            },
+            "259200": {
+              "available": true,
+              "position_difference_m": 0.0008335011365907468,
+              "velocity_difference_m_s": 9.457003723918844e-07,
+              "position_difference_rtn_m": [
+                -3.6652614155818623e-06,
+                0.0008334929516385084,
+                4.5839475295116733e-07
+              ]
+            },
+            "604800": {
+              "available": true,
+              "position_difference_m": 0.00693093826039059,
+              "velocity_difference_m_s": 7.85527683145658e-06,
+              "position_difference_rtn_m": [
+                -9.108829533060374e-06,
+                0.006930931920768053,
+                -2.215456872587361e-06
+              ]
+            }
+          }
+        }
+      }
+    },
+    "drag_1": {
+      "name": "drag_1",
+      "j2": 0.00108263,
+      "drag": {
+        "mass_kg": 1000.0,
+        "cd": 2.2,
+        "area_m2": 10.0,
+        "rho_ref_kg_m3": 4e-12,
+        "h_ref_m": 400000.0,
+        "scale_height_m": 60000.0,
+        "density_multiplier": 1.0,
+        "omega_rad_s": 7.292115e-05,
+        "min_altitude_m": 200000.0
+      },
+      "requested_duration_s": 604800.0,
+      "output_interval_s": 60.0,
+      "stop_altitude_m": 200000.0,
+      "common_comparison_end_s": 604800.0,
+      "difference_convention": "Orekit minus SciPy for cross-library pairs; RTN frame follows the stated SciPy level.",
+      "solver_runs": {
+        "scipy": {
+          "nominal": {
+            "rtol": 1e-10,
+            "cartesian_atol_si": [
+              0.0001,
+              0.0001,
+              0.0001,
+              1e-07,
+              1e-07,
+              1e-07
+            ],
+            "end_time_s": 604800.0,
+            "output_samples": 10081,
+            "stopped_at_altitude_limit": false,
+            "rhs_evaluations": 43457,
+            "work_atol_m2_s2": 1e-05
+          },
+          "tighter": {
+            "rtol": 1e-12,
+            "cartesian_atol_si": [
+              1e-06,
+              1e-06,
+              1e-06,
+              9.999999999999999e-10,
+              9.999999999999999e-10,
+              9.999999999999999e-10
+            ],
+            "end_time_s": 604800.0,
+            "output_samples": 10081,
+            "stopped_at_altitude_limit": false,
+            "rhs_evaluations": 77522,
+            "work_atol_m2_s2": 1.0000000000000001e-07
+          },
+          "reference": {
+            "rtol": 1e-13,
+            "cartesian_atol_si": [
+              1.0000000000000001e-07,
+              1.0000000000000001e-07,
+              1.0000000000000001e-07,
+              9.999999999999999e-11,
+              9.999999999999999e-11,
+              9.999999999999999e-11
+            ],
+            "end_time_s": 604800.0,
+            "output_samples": 10081,
+            "stopped_at_altitude_limit": false,
+            "rhs_evaluations": 103487,
+            "work_atol_m2_s2": 1e-08
+          }
+        },
+        "orekit": {
+          "nominal": {
+            "rtol": 1e-10,
+            "cartesian_atol_si": [
+              0.0001,
+              0.0001,
+              0.0001,
+              1e-07,
+              1e-07,
+              1e-07
+            ],
+            "end_time_s": 604800.0,
+            "output_samples": 10081,
+            "stopped_at_altitude_limit": false,
+            "rhs_evaluations": 43457,
+            "mass_atol_kg": 1e-09,
+            "force_models": [
+              "HolmesFeatherstoneAttractionModel",
+              "DragForce",
+              "NewtonianAttraction"
+            ],
+            "final_mass_kg": 1000.0
+          },
+          "tighter": {
+            "rtol": 1e-12,
+            "cartesian_atol_si": [
+              1e-06,
+              1e-06,
+              1e-06,
+              9.999999999999999e-10,
+              9.999999999999999e-10,
+              9.999999999999999e-10
+            ],
+            "end_time_s": 604800.0,
+            "output_samples": 10081,
+            "stopped_at_altitude_limit": false,
+            "rhs_evaluations": 77522,
+            "mass_atol_kg": 1.0000000000000001e-11,
+            "force_models": [
+              "HolmesFeatherstoneAttractionModel",
+              "DragForce",
+              "NewtonianAttraction"
+            ],
+            "final_mass_kg": 1000.0
+          },
+          "reference": {
+            "rtol": 1e-13,
+            "cartesian_atol_si": [
+              1.0000000000000001e-07,
+              1.0000000000000001e-07,
+              1.0000000000000001e-07,
+              9.999999999999999e-11,
+              9.999999999999999e-11,
+              9.999999999999999e-11
+            ],
+            "end_time_s": 604800.0,
+            "output_samples": 10081,
+            "stopped_at_altitude_limit": false,
+            "rhs_evaluations": 103487,
+            "mass_atol_kg": 1e-12,
+            "force_models": [
+              "HolmesFeatherstoneAttractionModel",
+              "DragForce",
+              "NewtonianAttraction"
+            ],
+            "final_mass_kg": 1000.0
+          }
+        }
+      },
+      "comparisons": {
+        "both_nominal": {
+          "max_position_difference_m": 0.0007648445686628272,
+          "max_velocity_difference_m_s": 7.670160196605932e-07,
+          "checkpoints_elapsed_s": {
+            "86400": {
+              "available": true,
+              "position_difference_m": 2.5119495789540635e-05,
+              "velocity_difference_m_s": 1.2906685104756717e-08,
+              "position_difference_rtn_m": [
+                -1.2595362927413114e-05,
+                2.173352022671075e-05,
+                -5.149608408202671e-11
+              ]
+            },
+            "259200": {
+              "available": true,
+              "position_difference_m": 0.00023379638164334958,
+              "velocity_difference_m_s": 1.604928456342408e-07,
+              "position_difference_rtn_m": [
+                0.0002012978424770197,
+                0.00011891113018205632,
+                -2.642015249592326e-07
+              ]
+            },
+            "604800": {
+              "available": true,
+              "position_difference_m": 0.0006349488387788088,
+              "velocity_difference_m_s": 7.095363984699367e-07,
+              "position_difference_rtn_m": [
+                4.1833018594025426e-06,
+                0.0006349349808088063,
+                -3.130454142174935e-07
+              ]
+            }
+          }
+        },
+        "only_scipy_tighter": {
+          "max_position_difference_m": 1.5708711075496775,
+          "max_velocity_difference_m_s": 0.0017830617413697556,
+          "checkpoints_elapsed_s": {
+            "86400": {
+              "available": true,
+              "position_difference_m": 0.004445620410491225,
+              "velocity_difference_m_s": 5.136598235698706e-06,
+              "position_difference_rtn_m": [
+                -0.0007763254028692078,
+                0.004377309512490327,
+                -4.597270692581262e-06
+              ]
+            },
+            "259200": {
+              "available": true,
+              "position_difference_m": 0.23503909336412032,
+              "velocity_difference_m_s": 0.00026674186126939703,
+              "position_difference_rtn_m": [
+                -0.0013790299130678335,
+                0.23503500680218076,
+                0.000138792742392993
+              ]
+            },
+            "604800": {
+              "available": true,
+              "position_difference_m": 1.5708711075496775,
+              "velocity_difference_m_s": 0.0017830617413697556,
+              "position_difference_rtn_m": [
+                -0.0028896845387720305,
+                1.5708682440883552,
+                -0.000803724072650891
+              ]
+            }
+          }
+        },
+        "only_orekit_tighter": {
+          "max_position_difference_m": 1.5697889443920674,
+          "max_velocity_difference_m_s": 0.0017818443779783193,
+          "checkpoints_elapsed_s": {
+            "86400": {
+              "available": true,
+              "position_difference_m": 0.004410733497218611,
+              "velocity_difference_m_s": 5.112131768143372e-06,
+              "position_difference_rtn_m": [
+                0.0007634676440453263,
+                -0.004344153073645988,
+                4.605726252505807e-06
+              ]
+            },
+            "259200": {
+              "available": true,
+              "position_difference_m": 0.23482425425542458,
+              "velocity_difference_m_s": 0.00026647188147552935,
+              "position_difference_rtn_m": [
+                0.0015802475347345968,
+                -0.23481889590932264,
+                -0.00013902615572233823
+              ]
+            },
+            "604800": {
+              "available": true,
+              "position_difference_m": 1.5697889443920674,
+              "velocity_difference_m_s": 0.0017818443779783193,
+              "position_difference_rtn_m": [
+                0.002892497107217451,
+                -1.5697860740680227,
+                0.0008031551218897759
+              ]
+            }
+          }
+        },
+        "both_tighter": {
+          "max_position_difference_m": 0.0004472369149727014,
+          "max_velocity_difference_m_s": 5.078547759339893e-07,
+          "checkpoints_elapsed_s": {
+            "86400": {
+              "available": true,
+              "position_difference_m": 1.1425935570859477e-05,
+              "velocity_difference_m_s": 1.3025158929599358e-08,
+              "position_difference_rtn_m": [
+                -2.623930832115192e-07,
+                1.1422919117695854e-05,
+                8.507049617620483e-09
+              ]
+            },
+            "259200": {
+              "available": true,
+              "position_difference_m": 9.719984215326568e-05,
+              "velocity_difference_m_s": 1.1025668800925264e-07,
+              "position_difference_rtn_m": [
+                -7.206270541016495e-08,
+                9.719981056891647e-05,
+                3.077260146088737e-08
+              ]
+            },
+            "604800": {
+              "available": true,
+              "position_difference_m": 0.0004472369149727014,
+              "velocity_difference_m_s": 5.078547759339893e-07,
+              "position_difference_rtn_m": [
+                -1.0059679523513772e-06,
+                0.0004472357108130147,
+                -2.5517906580152386e-07
+              ]
+            }
+          }
+        },
+        "both_reference": {
+          "max_position_difference_m": 0.00014386485387243592,
+          "max_velocity_difference_m_s": 1.6341810727285748e-07,
+          "checkpoints_elapsed_s": {
+            "86400": {
+              "available": true,
+              "position_difference_m": 8.572298169406019e-07,
+              "velocity_difference_m_s": 7.020698239985273e-10,
+              "position_difference_rtn_m": [
+                -4.4192322752404905e-07,
+                7.34526158232909e-07,
+                -4.259448127252111e-09
+              ]
+            },
+            "259200": {
+              "available": true,
+              "position_difference_m": 2.8275346107095115e-05,
+              "velocity_difference_m_s": 3.2023248913112695e-08,
+              "position_difference_rtn_m": [
+                -9.740901550310316e-08,
+                2.8275160864754663e-05,
+                -3.14170648530582e-08
+              ]
+            },
+            "604800": {
+              "available": true,
+              "position_difference_m": 0.0001437301956524366,
+              "velocity_difference_m_s": 1.633063254225543e-07,
+              "position_difference_rtn_m": [
+                -4.659112782248395e-07,
+                0.0001437294405078199,
+                5.268610079665176e-10
+              ]
+            }
+          }
+        },
+        "scipy_nominal_vs_reference": {
+          "max_position_difference_m": 1.5770892482513585,
+          "max_velocity_difference_m_s": 0.00179013087901624,
+          "checkpoints_elapsed_s": {
+            "86400": {
+              "available": true,
+              "position_difference_m": 0.004321046480671332,
+              "velocity_difference_m_s": 5.008854207121642e-06,
+              "position_difference_rtn_m": [
+                -0.0007698883206164648,
+                0.004251904743646636,
+                -4.551137847092022e-06
+              ]
+            },
+            "259200": {
+              "available": true,
+              "position_difference_m": 0.23572152577348948,
+              "velocity_difference_m_s": 0.00026748969837043433,
+              "position_difference_rtn_m": [
+                -0.0015905405757742075,
+                0.23571611827811936,
+                0.0001395620088708721
+              ]
+            },
+            "604800": {
+              "available": true,
+              "position_difference_m": 1.5770892482513585,
+              "velocity_difference_m_s": 0.00179013087901624,
+              "position_difference_rtn_m": [
+                -0.002901918707522433,
+                1.5770863719754342,
+                -0.0008069369320946596
+              ]
+            }
+          }
+        },
+        "scipy_tighter_vs_reference": {
+          "max_position_difference_m": 0.006853068506148035,
+          "max_velocity_difference_m_s": 7.778648846073201e-06,
+          "checkpoints_elapsed_s": {
+            "86400": {
+              "available": true,
+              "position_difference_m": 0.00010385400492648097,
+              "velocity_difference_m_s": 1.1633196289570462e-07,
+              "position_difference_rtn_m": [
+                -6.158280755477051e-06,
+                -0.00010367124863681096,
+                4.6081349535024413e-08
+              ]
+            },
+            "259200": {
+              "available": true,
+              "position_difference_m": 0.0008000879564721968,
+              "velocity_difference_m_s": 9.075685653345375e-07,
+              "position_difference_rtn_m": [
+                -1.0212796578078405e-05,
+                0.0008000226132974911,
+                5.050649103863474e-07
+              ]
+            },
+            "604800": {
+              "available": true,
+              "position_difference_m": 0.006853068506148035,
+              "velocity_difference_m_s": 7.778648846073201e-06,
+              "position_difference_rtn_m": [
+                -8.049422591469187e-06,
+                0.006853062871794573,
+                -3.5259019717692915e-06
+              ]
+            }
+          }
+        },
+        "orekit_nominal_vs_reference": {
+          "max_position_difference_m": 1.5775804445124988,
+          "max_velocity_difference_m_s": 0.0017906770815883204,
+          "checkpoints_elapsed_s": {
+            "86400": {
+              "available": true,
+              "position_difference_m": 0.0043438826343702745,
+              "velocity_difference_m_s": 5.019602583561037e-06,
+              "position_difference_rtn_m": [
+                -0.0007820417603295604,
+                0.004272903737707275,
+                -4.546929895000865e-06
+              ]
+            },
+            "259200": {
+              "available": true,
+              "position_difference_m": 0.23581088713075793,
+              "velocity_difference_m_s": 0.0002676173988574108,
+              "position_difference_rtn_m": [
+                -0.00138914532743932,
+                0.23580675425445624,
+                0.00013932922442126683
+              ]
+            },
+            "604800": {
+              "available": true,
+              "position_difference_m": 1.5775804445124988,
+              "velocity_difference_m_s": 0.0017906770815883204,
+              "position_difference_rtn_m": [
+                -0.002897269608965747,
+                1.5775775775167726,
+                -0.0008072505046052836
+              ]
+            }
+          }
+        },
+        "orekit_tighter_vs_reference": {
+          "max_position_difference_m": 0.00715657529586325,
+          "max_velocity_difference_m_s": 8.123197282050886e-06,
+          "checkpoints_elapsed_s": {
+            "86400": {
+              "available": true,
+              "position_difference_m": 9.317489131655222e-05,
+              "velocity_difference_m_s": 1.0400253953794201e-07,
+              "position_difference_rtn_m": [
+                -5.978750610999435e-06,
+                -9.298285567734335e-05,
+                5.8847847279422404e-08
+              ]
+            },
+            "259200": {
+              "available": true,
+              "position_difference_m": 0.000869007164411779,
+              "velocity_difference_m_s": 9.857997380748183e-07,
+              "position_difference_rtn_m": [
+                -1.0187450275848226e-05,
+                0.0008689472630016867,
+                5.672545767170033e-07
+              ]
+            },
+            "604800": {
+              "available": true,
+              "position_difference_m": 0.00715657529586325,
+              "velocity_difference_m_s": 8.123197282050886e-06,
+              "position_difference_rtn_m": [
+                -8.589479566813597e-06,
+                0.007156569142098931,
+                -3.7816078992114477e-06
+              ]
+            }
+          }
+        }
+      }
+    },
+    "drag_0.5": {
+      "name": "drag_0.5",
+      "j2": 0.00108263,
+      "drag": {
+        "mass_kg": 1000.0,
+        "cd": 2.2,
+        "area_m2": 10.0,
+        "rho_ref_kg_m3": 4e-12,
+        "h_ref_m": 400000.0,
+        "scale_height_m": 60000.0,
+        "density_multiplier": 0.5,
+        "omega_rad_s": 7.292115e-05,
+        "min_altitude_m": 200000.0
+      },
+      "requested_duration_s": 604800.0,
+      "output_interval_s": 60.0,
+      "stop_altitude_m": 200000.0,
+      "common_comparison_end_s": 604800.0,
+      "difference_convention": "Orekit minus SciPy for cross-library pairs; RTN frame follows the stated SciPy level.",
+      "solver_runs": {
+        "scipy": {
+          "nominal": {
+            "rtol": 1e-10,
+            "cartesian_atol_si": [
+              0.0001,
+              0.0001,
+              0.0001,
+              1e-07,
+              1e-07,
+              1e-07
+            ],
+            "end_time_s": 604800.0,
+            "output_samples": 10081,
+            "stopped_at_altitude_limit": false,
+            "rhs_evaluations": 43457,
+            "work_atol_m2_s2": 1e-05
+          },
+          "tighter": {
+            "rtol": 1e-12,
+            "cartesian_atol_si": [
+              1e-06,
+              1e-06,
+              1e-06,
+              9.999999999999999e-10,
+              9.999999999999999e-10,
+              9.999999999999999e-10
+            ],
+            "end_time_s": 604800.0,
+            "output_samples": 10081,
+            "stopped_at_altitude_limit": false,
+            "rhs_evaluations": 77507,
+            "work_atol_m2_s2": 1.0000000000000001e-07
+          },
+          "reference": {
+            "rtol": 1e-13,
+            "cartesian_atol_si": [
+              1.0000000000000001e-07,
+              1.0000000000000001e-07,
+              1.0000000000000001e-07,
+              9.999999999999999e-11,
+              9.999999999999999e-11,
+              9.999999999999999e-11
+            ],
+            "end_time_s": 604800.0,
+            "output_samples": 10081,
+            "stopped_at_altitude_limit": false,
+            "rhs_evaluations": 103472,
+            "work_atol_m2_s2": 1e-08
+          }
+        },
+        "orekit": {
+          "nominal": {
+            "rtol": 1e-10,
+            "cartesian_atol_si": [
+              0.0001,
+              0.0001,
+              0.0001,
+              1e-07,
+              1e-07,
+              1e-07
+            ],
+            "end_time_s": 604800.0,
+            "output_samples": 10081,
+            "stopped_at_altitude_limit": false,
+            "rhs_evaluations": 43457,
+            "mass_atol_kg": 1e-09,
+            "force_models": [
+              "HolmesFeatherstoneAttractionModel",
+              "DragForce",
+              "NewtonianAttraction"
+            ],
+            "final_mass_kg": 1000.0
+          },
+          "tighter": {
+            "rtol": 1e-12,
+            "cartesian_atol_si": [
+              1e-06,
+              1e-06,
+              1e-06,
+              9.999999999999999e-10,
+              9.999999999999999e-10,
+              9.999999999999999e-10
+            ],
+            "end_time_s": 604800.0,
+            "output_samples": 10081,
+            "stopped_at_altitude_limit": false,
+            "rhs_evaluations": 77507,
+            "mass_atol_kg": 1.0000000000000001e-11,
+            "force_models": [
+              "HolmesFeatherstoneAttractionModel",
+              "DragForce",
+              "NewtonianAttraction"
+            ],
+            "final_mass_kg": 1000.0
+          },
+          "reference": {
+            "rtol": 1e-13,
+            "cartesian_atol_si": [
+              1.0000000000000001e-07,
+              1.0000000000000001e-07,
+              1.0000000000000001e-07,
+              9.999999999999999e-11,
+              9.999999999999999e-11,
+              9.999999999999999e-11
+            ],
+            "end_time_s": 604800.0,
+            "output_samples": 10081,
+            "stopped_at_altitude_limit": false,
+            "rhs_evaluations": 103472,
+            "mass_atol_kg": 1e-12,
+            "force_models": [
+              "HolmesFeatherstoneAttractionModel",
+              "DragForce",
+              "NewtonianAttraction"
+            ],
+            "final_mass_kg": 1000.0
+          }
+        }
+      },
+      "comparisons": {
+        "both_nominal": {
+          "max_position_difference_m": 0.0005699617381164144,
+          "max_velocity_difference_m_s": 5.540577026825424e-07,
+          "checkpoints_elapsed_s": {
+            "86400": {
+              "available": true,
+              "position_difference_m": 3.075173114606768e-05,
+              "velocity_difference_m_s": 9.040606090318405e-09,
+              "position_difference_rtn_m": [
+                -2.511610298058543e-05,
+                1.7744009509161577e-05,
+                -2.158905834578833e-08
+              ]
+            },
+            "259200": {
+              "available": true,
+              "position_difference_m": 0.0001674958292155281,
+              "velocity_difference_m_s": 1.2200437851358234e-07,
+              "position_difference_rtn_m": [
+                0.00013167429261496053,
+                0.00010352154613465554,
+                -1.5150853932755686e-07
+              ]
+            },
+            "604800": {
+              "available": true,
+              "position_difference_m": 0.00045055931351512625,
+              "velocity_difference_m_s": 5.108112559605773e-07,
+              "position_difference_rtn_m": [
+                3.3942043718574924e-06,
+                0.0004505464513918962,
+                -2.636476315771581e-07
+              ]
+            }
+          }
+        },
+        "only_scipy_tighter": {
+          "max_position_difference_m": 1.5581689806918322,
+          "max_velocity_difference_m_s": 0.001767493381862733,
+          "checkpoints_elapsed_s": {
+            "86400": {
+              "available": true,
+              "position_difference_m": 0.0044440041559313526,
+              "velocity_difference_m_s": 5.137897967706099e-06,
+              "position_difference_rtn_m": [
+                -0.0007779031059993926,
+                0.004375387778753381,
+                -4.634775851004641e-06
+              ]
+            },
+            "259200": {
+              "available": true,
+              "position_difference_m": 0.23426827755111554,
+              "velocity_difference_m_s": 0.00026578949658460747,
+              "position_difference_rtn_m": [
+                -0.0018337941693522125,
+                0.234261061149791,
+                0.00013525784578723166
+              ]
+            },
+            "604800": {
+              "available": true,
+              "position_difference_m": 1.5581689806918322,
+              "velocity_difference_m_s": 0.001767493381862733,
+              "position_difference_rtn_m": [
+                -0.002961673864954828,
+                1.5581660292918302,
+                -0.000652716685374366
+              ]
+            }
+          }
+        },
+        "only_orekit_tighter": {
+          "max_position_difference_m": 1.557507392116307,
+          "max_velocity_difference_m_s": 0.0017667432408135274,
+          "checkpoints_elapsed_s": {
+            "86400": {
+              "available": true,
+              "position_difference_m": 0.004413320461759212,
+              "velocity_difference_m_s": 5.123028124697318e-06,
+              "position_difference_rtn_m": [
+                0.0007527806370610374,
+                -0.004348643188198972,
+                4.607860587952251e-06
+              ]
+            },
+            "259200": {
+              "available": true,
+              "position_difference_m": 0.2341175494927831,
+              "velocity_difference_m_s": 0.0002656127530804485,
+              "position_difference_rtn_m": [
+                0.0019658515315686964,
+                -0.2341092567137934,
+                -0.0001353852900104341
+              ]
+            },
+            "604800": {
+              "available": true,
+              "position_difference_m": 1.557507392116307,
+              "velocity_difference_m_s": 0.0017667432408135274,
+              "position_difference_rtn_m": [
+                0.002964296532942723,
+                -1.5575044346299634,
+                0.0006523427029062612
+              ]
+            }
+          }
+        },
+        "both_tighter": {
+          "max_position_difference_m": 0.00021108577991822821,
+          "max_velocity_difference_m_s": 2.3935124841525336e-07,
+          "checkpoints_elapsed_s": {
+            "86400": {
+              "available": true,
+              "position_difference_m": 9.000585371921893e-06,
+              "velocity_difference_m_s": 1.032361355506507e-08,
+              "position_difference_rtn_m": [
+                -6.3631429355885224e-09,
+                9.000581546719179e-06,
+                -5.3262110874024465e-09
+              ]
+            },
+            "259200": {
+              "available": true,
+              "position_difference_m": 4.828454391637949e-05,
+              "velocity_difference_m_s": 5.4972353309315324e-08,
+              "position_difference_rtn_m": [
+                3.9117567667076796e-07,
+                4.8282953352791455e-05,
+                2.404859507779605e-08
+              ]
+            },
+            "604800": {
+              "available": true,
+              "position_difference_m": 0.00021104932475901552,
+              "velocity_difference_m_s": 2.3935124841525336e-07,
+              "position_difference_rtn_m": [
+                -4.1265312877592506e-07,
+                0.00021104889289479047,
+                -1.0957424407346395e-07
+              ]
+            }
+          }
+        },
+        "both_reference": {
+          "max_position_difference_m": 0.00019928812287508106,
+          "max_velocity_difference_m_s": 2.2641771003806838e-07,
+          "checkpoints_elapsed_s": {
+            "86400": {
+              "available": true,
+              "position_difference_m": 2.759798259765175e-06,
+              "velocity_difference_m_s": 3.0274863201477675e-09,
+              "position_difference_rtn_m": [
+                7.399275960377124e-07,
+                2.65871168505196e-06,
+                -1.5676829810412355e-08
+              ]
+            },
+            "259200": {
+              "available": true,
+              "position_difference_m": 2.9863590584464747e-05,
+              "velocity_difference_m_s": 3.3812978543407124e-08,
+              "position_difference_rtn_m": [
+                2.906844044726319e-07,
+                2.9862175035139648e-05,
+                6.880712899627137e-09
+              ]
+            },
+            "604800": {
+              "available": true,
+              "position_difference_m": 0.00019928812287508106,
+              "velocity_difference_m_s": 2.2641771003806838e-07,
+              "position_difference_rtn_m": [
+                -5.841552086521506e-07,
+                0.00019928726619542958,
+                -1.4632758140558624e-08
+              ]
+            }
+          }
+        },
+        "scipy_nominal_vs_reference": {
+          "max_position_difference_m": 1.5647192715668956,
+          "max_velocity_difference_m_s": 0.001774923174832917,
+          "checkpoints_elapsed_s": {
+            "86400": {
+              "available": true,
+              "position_difference_m": 0.004324973922502598,
+              "velocity_difference_m_s": 5.021678399046043e-06,
+              "position_difference_rtn_m": [
+                -0.0007583886292055182,
+                0.004257960231639198,
+                -4.558859324951467e-06
+              ]
+            },
+            "259200": {
+              "available": true,
+              "position_difference_m": 0.235006530003723,
+              "velocity_difference_m_s": 0.0002666217010236997,
+              "position_difference_rtn_m": [
+                -0.001969813471558904,
+                0.23499823511017492,
+                0.0001359204949479692
+              ]
+            },
+            "604800": {
+              "available": true,
+              "position_difference_m": 1.5647192715668956,
+              "velocity_difference_m_s": 0.001774923174832917,
+              "position_difference_rtn_m": [
+                -0.002974063479066702,
+                1.564716307888573,
+                -0.0006554287236847922
+              ]
+            }
+          }
+        },
+        "scipy_tighter_vs_reference": {
+          "max_position_difference_m": 0.007000831461581585,
+          "max_velocity_difference_m_s": 7.940584997480513e-06,
+          "checkpoints_elapsed_s": {
+            "86400": {
+              "available": true,
+              "position_difference_m": 9.984081752044238e-05,
+              "velocity_difference_m_s": 1.1169763788380035e-07,
+              "position_difference_rtn_m": [
+                -5.6016262624123336e-06,
+                -9.9683537632313e-05,
+                5.432746783971994e-08
+              ]
+            },
+            "259200": {
+              "available": true,
+              "position_difference_m": 0.0008407068947648748,
+              "velocity_difference_m_s": 9.539803195799719e-07,
+              "position_difference_rtn_m": [
+                -4.344984078246609e-06,
+                0.0008406955113201638,
+                5.111405738574817e-07
+              ]
+            },
+            "604800": {
+              "available": true,
+              "position_difference_m": 0.007000831461581585,
+              "velocity_difference_m_s": 7.940584997480513e-06,
+              "position_difference_rtn_m": [
+                -8.993900848281496e-06,
+                0.00700082505198712,
+                -2.9756827171843313e-06
+              ]
+            }
+          }
+        },
+        "orekit_nominal_vs_reference": {
+          "max_position_difference_m": 1.56497052282616,
+          "max_velocity_difference_m_s": 0.0017752075471157056,
+          "checkpoints_elapsed_s": {
+            "86400": {
+              "available": true,
+              "position_difference_m": 0.004344419250059187,
+              "velocity_difference_m_s": 5.023206525298895e-06,
+              "position_difference_rtn_m": [
+                -0.0007842446597916381,
+                0.004273045529447796,
+                -4.564771553447304e-06
+              ]
+            },
+            "259200": {
+              "available": true,
+              "position_difference_m": 0.2350791224947267,
+              "velocity_difference_m_s": 0.000266709661364376,
+              "position_difference_rtn_m": [
+                -0.001838429865906599,
+                0.23507189448585622,
+                0.00013576210570273584
+              ]
+            },
+            "604800": {
+              "available": true,
+              "position_difference_m": 1.56497052282616,
+              "velocity_difference_m_s": 0.0017752075471157056,
+              "position_difference_rtn_m": [
+                -0.002970085177617765,
+                1.5649675670746424,
+                -0.0006556777386748092
+              ]
+            }
+          }
+        },
+        "orekit_tighter_vs_reference": {
+          "max_position_difference_m": 0.007012592900599747,
+          "max_velocity_difference_m_s": 7.953518829776748e-06,
+          "checkpoints_elapsed_s": {
+            "86400": {
+              "available": true,
+              "position_difference_m": 9.355729354633596e-05,
+              "velocity_difference_m_s": 1.0440085219350498e-07,
+              "position_difference_rtn_m": [
+                -6.347917001289622e-06,
+                -9.334166777064321e-05,
+                6.467808656252465e-08
+              ]
+            },
+            "259200": {
+              "available": true,
+              "position_difference_m": 0.0008591269370414287,
+              "velocity_difference_m_s": 9.751423349018045e-07,
+              "position_difference_rtn_m": [
+                -4.244492808256153e-06,
+                0.000859116289637883,
+                5.283084560378309e-07
+              ]
+            },
+            "604800": {
+              "available": true,
+              "position_difference_m": 0.007012592900599747,
+              "velocity_difference_m_s": 7.953518829776748e-06,
+              "position_difference_rtn_m": [
+                -8.822398780235306e-06,
+                0.007012586678686314,
+                -3.0706242031151767e-06
+              ]
+            }
+          }
+        }
+      }
+    },
+    "drag_2": {
+      "name": "drag_2",
+      "j2": 0.00108263,
+      "drag": {
+        "mass_kg": 1000.0,
+        "cd": 2.2,
+        "area_m2": 10.0,
+        "rho_ref_kg_m3": 4e-12,
+        "h_ref_m": 400000.0,
+        "scale_height_m": 60000.0,
+        "density_multiplier": 2.0,
+        "omega_rad_s": 7.292115e-05,
+        "min_altitude_m": 200000.0
+      },
+      "requested_duration_s": 604800.0,
+      "output_interval_s": 60.0,
+      "stop_altitude_m": 200000.0,
+      "common_comparison_end_s": 604800.0,
+      "difference_convention": "Orekit minus SciPy for cross-library pairs; RTN frame follows the stated SciPy level.",
+      "solver_runs": {
+        "scipy": {
+          "nominal": {
+            "rtol": 1e-10,
+            "cartesian_atol_si": [
+              0.0001,
+              0.0001,
+              0.0001,
+              1e-07,
+              1e-07,
+              1e-07
+            ],
+            "end_time_s": 604800.0,
+            "output_samples": 10081,
+            "stopped_at_altitude_limit": false,
+            "rhs_evaluations": 43472,
+            "work_atol_m2_s2": 1e-05
+          },
+          "tighter": {
+            "rtol": 1e-12,
+            "cartesian_atol_si": [
+              1e-06,
+              1e-06,
+              1e-06,
+              9.999999999999999e-10,
+              9.999999999999999e-10,
+              9.999999999999999e-10
+            ],
+            "end_time_s": 604800.0,
+            "output_samples": 10081,
+            "stopped_at_altitude_limit": false,
+            "rhs_evaluations": 77552,
+            "work_atol_m2_s2": 1.0000000000000001e-07
+          },
+          "reference": {
+            "rtol": 1e-13,
+            "cartesian_atol_si": [
+              1.0000000000000001e-07,
+              1.0000000000000001e-07,
+              1.0000000000000001e-07,
+              9.999999999999999e-11,
+              9.999999999999999e-11,
+              9.999999999999999e-11
+            ],
+            "end_time_s": 604800.0,
+            "output_samples": 10081,
+            "stopped_at_altitude_limit": false,
+            "rhs_evaluations": 103517,
+            "work_atol_m2_s2": 1e-08
+          }
+        },
+        "orekit": {
+          "nominal": {
+            "rtol": 1e-10,
+            "cartesian_atol_si": [
+              0.0001,
+              0.0001,
+              0.0001,
+              1e-07,
+              1e-07,
+              1e-07
+            ],
+            "end_time_s": 604800.0,
+            "output_samples": 10081,
+            "stopped_at_altitude_limit": false,
+            "rhs_evaluations": 43472,
+            "mass_atol_kg": 1e-09,
+            "force_models": [
+              "HolmesFeatherstoneAttractionModel",
+              "DragForce",
+              "NewtonianAttraction"
+            ],
+            "final_mass_kg": 1000.0
+          },
+          "tighter": {
+            "rtol": 1e-12,
+            "cartesian_atol_si": [
+              1e-06,
+              1e-06,
+              1e-06,
+              9.999999999999999e-10,
+              9.999999999999999e-10,
+              9.999999999999999e-10
+            ],
+            "end_time_s": 604800.0,
+            "output_samples": 10081,
+            "stopped_at_altitude_limit": false,
+            "rhs_evaluations": 77552,
+            "mass_atol_kg": 1.0000000000000001e-11,
+            "force_models": [
+              "HolmesFeatherstoneAttractionModel",
+              "DragForce",
+              "NewtonianAttraction"
+            ],
+            "final_mass_kg": 1000.0
+          },
+          "reference": {
+            "rtol": 1e-13,
+            "cartesian_atol_si": [
+              1.0000000000000001e-07,
+              1.0000000000000001e-07,
+              1.0000000000000001e-07,
+              9.999999999999999e-11,
+              9.999999999999999e-11,
+              9.999999999999999e-11
+            ],
+            "end_time_s": 604800.0,
+            "output_samples": 10081,
+            "stopped_at_altitude_limit": false,
+            "rhs_evaluations": 103532,
+            "mass_atol_kg": 1e-12,
+            "force_models": [
+              "HolmesFeatherstoneAttractionModel",
+              "DragForce",
+              "NewtonianAttraction"
+            ],
+            "final_mass_kg": 1000.0
+          }
+        }
+      },
+      "comparisons": {
+        "both_nominal": {
+          "max_position_difference_m": 0.0006703449818070613,
+          "max_velocity_difference_m_s": 6.779231866720855e-07,
+          "checkpoints_elapsed_s": {
+            "86400": {
+              "available": true,
+              "position_difference_m": 2.01363823044079e-05,
+              "velocity_difference_m_s": 7.501671319518099e-09,
+              "position_difference_rtn_m": [
+                1.5217530093154229e-05,
+                1.3187062671695737e-05,
+                -4.525777265662411e-08
+              ]
+            },
+            "259200": {
+              "available": true,
+              "position_difference_m": 0.0001167908493696936,
+              "velocity_difference_m_s": 1.0229469673928705e-07,
+              "position_difference_rtn_m": [
+                -7.67958164501642e-05,
+                8.799130883042867e-05,
+                1.861251065075591e-07
+              ]
+            },
+            "604800": {
+              "available": true,
+              "position_difference_m": 0.0005489257673250171,
+              "velocity_difference_m_s": 6.191670280814639e-07,
+              "position_difference_rtn_m": [
+                4.209042362883004e-06,
+                0.000548909469386597,
+                -4.200160365181143e-07
+              ]
+            }
+          }
+        },
+        "only_scipy_tighter": {
+          "max_position_difference_m": 1.5969538319630447,
+          "max_velocity_difference_m_s": 0.0018151990198743819,
+          "checkpoints_elapsed_s": {
+            "86400": {
+              "available": true,
+              "position_difference_m": 0.004416264577399194,
+              "velocity_difference_m_s": 5.1012071536313135e-06,
+              "position_difference_rtn_m": [
+                -0.0007606568663374291,
+                0.004350261248683056,
+                -4.584483737179188e-06
+              ]
+            },
+            "259200": {
+              "available": true,
+              "position_difference_m": 0.23640110657792038,
+              "velocity_difference_m_s": 0.00026844832663764306,
+              "position_difference_rtn_m": [
+                -0.0010072514468402322,
+                0.236398915318283,
+                0.00014653370726530612
+              ]
+            },
+            "604800": {
+              "available": true,
+              "position_difference_m": 1.5969538319630447,
+              "velocity_difference_m_s": 0.0018151990198743819,
+              "position_difference_rtn_m": [
+                -0.0028145288882390207,
+                1.5969509816496765,
+                -0.0010872243211536015
+              ]
+            }
+          }
+        },
+        "only_orekit_tighter": {
+          "max_position_difference_m": 1.5962406205533153,
+          "max_velocity_difference_m_s": 0.001814393170959188,
+          "checkpoints_elapsed_s": {
+            "86400": {
+              "available": true,
+              "position_difference_m": 0.004403073120765824,
+              "velocity_difference_m_s": 5.090631987755695e-06,
+              "position_difference_rtn_m": [
+                0.0007765452587204355,
+                -0.0043340523260802745,
+                4.561005093865799e-06
+              ]
+            },
+            "259200": {
+              "available": true,
+              "position_difference_m": 0.23628960675784852,
+              "velocity_difference_m_s": 0.00026831987045284434,
+              "position_difference_rtn_m": [
+                0.0009289781023447269,
+                -0.2362877352855431,
+                -0.00014633896669968838
+              ]
+            },
+            "604800": {
+              "available": true,
+              "position_difference_m": 1.5962406205533153,
+              "velocity_difference_m_s": 0.001814393170959188,
+              "position_difference_rtn_m": [
+                0.002817883892540285,
+                -1.5962377633968445,
+                0.0010867109276168074
+              ]
+            }
+          }
+        },
+        "both_tighter": {
+          "max_position_difference_m": 0.00016431016656427467,
+          "max_velocity_difference_m_s": 1.8671145961639928e-07,
+          "checkpoints_elapsed_s": {
+            "86400": {
+              "available": true,
+              "position_difference_m": 3.0955087918561357e-06,
+              "velocity_difference_m_s": 3.4084772506966653e-09,
+              "position_difference_rtn_m": [
+                6.708650793562433e-07,
+                3.0218604196025567e-06,
+                2.1779122995091572e-08
+              ]
+            },
+            "259200": {
+              "available": true,
+              "position_difference_m": 2.323526145775509e-05,
+              "velocity_difference_m_s": 2.6338877278198292e-08,
+              "position_difference_rtn_m": [
+                -1.469270041598043e-06,
+                2.3188759056756193e-05,
+                8.600163338206776e-09
+              ]
+            },
+            "604800": {
+              "available": true,
+              "position_difference_m": 0.00016431016656427467,
+              "velocity_difference_m_s": 1.8671145961639928e-07,
+              "position_difference_rtn_m": [
+                -4.7675316083557826e-07,
+                0.00016430944872234367,
+                -9.27543144389463e-08
+              ]
+            }
+          }
+        },
+        "both_reference": {
+          "max_position_difference_m": 0.00021579867052931668,
+          "max_velocity_difference_m_s": 2.4516802919918384e-07,
+          "checkpoints_elapsed_s": {
+            "86400": {
+              "available": true,
+              "position_difference_m": 2.6524713578118173e-06,
+              "velocity_difference_m_s": 2.730838832094808e-09,
+              "position_difference_rtn_m": [
+                -8.792415363946427e-07,
+                2.5024945640494133e-06,
+                -7.718911425324187e-09
+              ]
+            },
+            "259200": {
+              "available": true,
+              "position_difference_m": 3.9136359586187696e-05,
+              "velocity_difference_m_s": 4.437623811818281e-08,
+              "position_difference_rtn_m": [
+                -4.850883588130857e-07,
+                3.9133327016939155e-05,
+                4.524962795144472e-08
+              ]
+            },
+            "604800": {
+              "available": true,
+              "position_difference_m": 0.00021440293268208137,
+              "velocity_difference_m_s": 2.4376839631228e-07,
+              "position_difference_rtn_m": [
+                -4.2961658476298875e-07,
+                0.00021440244781205907,
+                -1.5278895414434627e-07
+              ]
+            }
+          }
+        },
+        "scipy_nominal_vs_reference": {
+          "max_position_difference_m": 1.6036431136314773,
+          "max_velocity_difference_m_s": 0.0018228084348555584,
+          "checkpoints_elapsed_s": {
+            "86400": {
+              "available": true,
+              "position_difference_m": 0.004312931034649979,
+              "velocity_difference_m_s": 4.9869614941863686e-06,
+              "position_difference_rtn_m": [
+                -0.0007820168920114362,
+                0.004241438855010833,
+                -4.486586687477839e-06
+              ]
+            },
+            "259200": {
+              "available": true,
+              "position_difference_m": 0.23717808135913254,
+              "velocity_difference_m_s": 0.00026932794857684807,
+              "position_difference_rtn_m": [
+                -0.0009419476465953591,
+                0.23717616536456693,
+                0.00014695165864937743
+              ]
+            },
+            "604800": {
+              "available": true,
+              "position_difference_m": 1.6036431136314773,
+              "velocity_difference_m_s": 0.0018228084348555584,
+              "position_difference_rtn_m": [
+                -0.0028270524833700628,
+                1.6036402500831823,
+                -0.0010917806847708933
+              ]
+            }
+          }
+        },
+        "scipy_tighter_vs_reference": {
+          "max_position_difference_m": 0.007238184391260994,
+          "max_velocity_difference_m_s": 8.228554714597191e-06,
+          "checkpoints_elapsed_s": {
+            "86400": {
+              "available": true,
+              "position_difference_m": 9.583240349445783e-05,
+              "velocity_difference_m_s": 1.0710959435825396e-07,
+              "position_difference_rtn_m": [
+                -6.142495650680614e-06,
+                -9.563533100174037e-05,
+                5.2639277139869913e-08
+              ]
+            },
+            "259200": {
+              "available": true,
+              "position_difference_m": 0.0008653178773630072,
+              "velocity_difference_m_s": 9.817473323342701e-07,
+              "position_difference_rtn_m": [
+                -1.1491989051324648e-05,
+                0.0008652413525504438,
+                6.040764381295581e-07
+              ]
+            },
+            "604800": {
+              "available": true,
+              "position_difference_m": 0.007238184391260994,
+              "velocity_difference_m_s": 8.228554714597191e-06,
+              "position_difference_rtn_m": [
+                -8.312972243943242e-06,
+                0.007238177906908505,
+                -4.976377033843668e-06
+              ]
+            }
+          }
+        },
+        "orekit_nominal_vs_reference": {
+          "max_position_difference_m": 1.6039776120699571,
+          "max_velocity_difference_m_s": 0.0018231838040475138,
+          "checkpoints_elapsed_s": {
+            "86400": {
+              "available": true,
+              "position_difference_m": 0.004320556411394775,
+              "velocity_difference_m_s": 4.991398973906947e-06,
+              "position_difference_rtn_m": [
+                -0.0007659201203885878,
+                0.004252123423128313,
+                -4.524125548703486e-06
+              ]
+            },
+            "259200": {
+              "available": true,
+              "position_difference_m": 0.23722725430850192,
+              "velocity_difference_m_s": 0.0002693856902593117,
+              "position_difference_rtn_m": [
+                -0.0010182583763995445,
+                0.23722502334369355,
+                0.0001470925341306023
+              ]
+            },
+            "604800": {
+              "available": true,
+              "position_difference_m": 1.6039776120699571,
+              "velocity_difference_m_s": 0.0018231838040475138,
+              "position_difference_rtn_m": [
+                -0.0028224139038067197,
+                1.6039747571058456,
+                -0.0010920479119960191
+              ]
+            }
+          }
+        },
+        "orekit_tighter_vs_reference": {
+          "max_position_difference_m": 0.007188091450715542,
+          "max_velocity_difference_m_s": 8.171497714450264e-06,
+          "checkpoints_elapsed_s": {
+            "86400": {
+              "available": true,
+              "position_difference_m": 9.522680089805712e-05,
+              "velocity_difference_m_s": 1.0643040865313475e-07,
+              "position_difference_rtn_m": [
+                -4.592389034922186e-06,
+                -9.511596514619503e-05,
+                8.213731156025126e-08
+              ]
+            },
+            "259200": {
+              "available": true,
+              "position_difference_m": 0.0008493886066605012,
+              "velocity_difference_m_s": 9.637107598577862e-07,
+              "position_difference_rtn_m": [
+                -1.247617073216222e-05,
+                0.0008492967845901451,
+                5.674269735169097e-07
+              ]
+            },
+            "604800": {
+              "available": true,
+              "position_difference_m": 0.007188091450715542,
+              "velocity_difference_m_s": 8.171497714450264e-06,
+              "position_difference_rtn_m": [
+                -8.36010876794106e-06,
+                0.007188084907818544,
+                -4.916342394101995e-06
+              ]
+            }
+          }
+        }
+      }
+    }
+  }
+}
